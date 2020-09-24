@@ -1,0 +1,13 @@
+{
+    "mysql": {
+        "host": "localhost",
+        "port": 3308,
+        "user": "sysadm",
+        "password": "ek7F7ck3",
+        "database": "v4",
+        "stg_password": "kerberos1221",
+        "prod_password": "ek7F7ck3"
+
+    }
+}
+
