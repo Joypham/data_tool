@@ -3,6 +3,8 @@ import pandas as pd
 import time
 
 
+gsheet_id = input(f"\n Input gsheet_id: ").strip()
+
 def check_youtube_url_mp3():
     '''
     TrackID	Memo	URL_to_add	Type	Assignee
@@ -358,16 +360,3 @@ def check_box():
     df = pd.DataFrame(data=d)
     print(df)
 
-
-if __name__ == "__main__":
-    pd.set_option("display.max_rows", None, "display.max_columns", 15, 'display.width', 1000)
-    start_time = time.time()
-
-    # INPUT HERE:
-    gsheet_id = '17J5nC9HnX53U5htuxZVAsKFPh3SCaZaZ7iMKXtE44D8'  # test
-
-    # gsheet_id = '1RTFRwv3b2V7O1xVMVbLcAkQF9JWIQeu6FUrizX3FaGo'  # real
-    # start tool:
-
-    check_box()
-print("\n --- total time to process %s seconds ---" % (time.time() - start_time))
