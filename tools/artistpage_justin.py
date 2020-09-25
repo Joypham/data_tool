@@ -3,7 +3,7 @@ import pandas as pd
 import time
 
 
-gsheet_id = input(f"\n Input gsheet_id: ").strip()
+# gsheet_id = input(f"\n Input gsheet_id: ").strip()
 
 def check_youtube_url_mp3():
     '''
@@ -140,6 +140,7 @@ def check_album_image():
                                         no need to check
         not null	ok	null
         not null	added	not null
+        not null	not found	none
     :return:
     '''
     sheet_name = 'Album_image'
@@ -156,6 +157,11 @@ def check_album_image():
              (album_image['Album_uuid'] != '')
              & (album_image['Memo'] == 'added')
              & (album_image['url_to_add'] != '')
+     ) |
+     (
+             (album_image['Album_uuid'] != '')
+             & (album_image['Memo'] == 'not found')
+             & (album_image['url_to_add'] == 'none')
      ) |
      (
          (album_image['Assignee'] == 'no need to check')
@@ -359,4 +365,50 @@ def check_box():
     d = {'items': items, 'status': status, 'comment': comment}
     df = pd.DataFrame(data=d)
     print(df)
+
+def process_MP_4():
+    '''
+    TrackID	Memo	URL_to_add	Type	Assignee
+                                        no need to check
+    not null	added	length = 43	    C/D/Z
+    not null	not found	none	none
+    :return:
+    '''
+    sheet_name = 'MP_4'
+    original_df = get_df_from_speadsheet(gsheet_id, sheet_name)
+    youtube_url_mp4 = original_df[['track_id', 'Memo', 'url_to_add']]
+
+    get_youtube_url_mp4 = youtube_url_mp4[
+    ((
+             (youtube_url_mp4['track_id'] != '')
+             & (youtube_url_mp4['Memo'] == 'added')
+             & (youtube_url_mp4['len'] == 43)
+             & (youtube_url_mp4['Type'].isin(["c", "d", "z"]))
+     ) |
+     (
+             (youtube_url_mp4['track_id'] != '')
+             & (youtube_url_mp4['Memo'] == 'not found')
+             & (youtube_url_mp4['url_to_add'] == 'none')
+             & (youtube_url_mp4['Type'] == 'none')
+     ) |
+     (
+
+         (youtube_url_mp4['Assignee'] == 'no need to check')
+     ))
+    ]
+    # return check_youtube_url_mp3.track_id.str.upper()
+
+if __name__ == "__main__":
+    start_time = time.time()
+    # INPUT HERE
+    # Justin requirement: https://docs.google.com/spreadsheets/d/1LClklcO0OEMmQ1iaCZ34n1hhjlP1lIBj7JMjm2qrYVw/edit#gid=0
+    # Jane requirement: https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=653576103
+    # 'https://docs.google.com/spreadsheets/d/17J5nC9HnX53U5htuxZVAsKFPh3SCaZaZ7iMKXtE44D8'
+    gsheet_id = '17J5nC9HnX53U5htuxZVAsKFPh3SCaZaZ7iMKXtE44D8'
+
+    # Start tools:
+    check_box()
+    # process_MP_4()
+
+    print("--- %s seconds ---" % (time.time() - start_time))
 
