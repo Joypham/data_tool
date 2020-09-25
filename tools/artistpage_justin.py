@@ -1,4 +1,5 @@
-from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title
+from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title,update_value
+from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 import pandas as pd
 import time
 
@@ -363,8 +364,16 @@ def check_box():
     print(comment)
 
     d = {'items': items, 'status': status, 'comment': comment}
-    df = pd.DataFrame(data=d)
+    df = pd.DataFrame(data=d).astype(str)
     print(df)
+
+    if 'jane_to_check_result' in list_of_sheet_title:
+        update_value(df.values.tolist(),'jane_to_check_result!A2',gsheet_id)
+    else:
+        creat_new_sheet_and_update_data_from_df(df,gsheet_id,'jane_to_check_result')
+
+    return df
+
 
 def process_MP_4():
     '''
@@ -374,29 +383,19 @@ def process_MP_4():
     not null	not found	none	none
     :return:
     '''
-    sheet_name = 'MP_4'
-    original_df = get_df_from_speadsheet(gsheet_id, sheet_name)
-    youtube_url_mp4 = original_df[['track_id', 'Memo', 'url_to_add']]
 
-    get_youtube_url_mp4 = youtube_url_mp4[
-    ((
-             (youtube_url_mp4['track_id'] != '')
-             & (youtube_url_mp4['Memo'] == 'added')
-             & (youtube_url_mp4['len'] == 43)
-             & (youtube_url_mp4['Type'].isin(["c", "d", "z"]))
-     ) |
-     (
-             (youtube_url_mp4['track_id'] != '')
-             & (youtube_url_mp4['Memo'] == 'not found')
-             & (youtube_url_mp4['url_to_add'] == 'none')
-             & (youtube_url_mp4['Type'] == 'none')
-     ) |
-     (
+    checking = 'not ok' in check_box().status.drop_duplicates().tolist()
+    if checking == 1:
+        return print("Please recheck check_box is not ok")
+    else:
+        sheet_name = 'MP_4'
+        original_df = get_df_from_speadsheet(gsheet_id, sheet_name)
+        youtube_url_mp4 = original_df[['track_id', 'Memo', 'url_to_add']]
 
-         (youtube_url_mp4['Assignee'] == 'no need to check')
-     ))
-    ]
-    # return check_youtube_url_mp3.track_id.str.upper()
+
+        memo_not_ok = youtube_url_mp4[youtube_url_mp4['Memo'] == 'not ok']
+        print(memo_not_ok)
+
 
 if __name__ == "__main__":
     start_time = time.time()
@@ -407,8 +406,7 @@ if __name__ == "__main__":
     gsheet_id = '17J5nC9HnX53U5htuxZVAsKFPh3SCaZaZ7iMKXtE44D8'
 
     # Start tools:
-    check_box()
-    # process_MP_4()
+    # check_box()
+    process_MP_4()
 
     print("--- %s seconds ---" % (time.time() - start_time))
-
