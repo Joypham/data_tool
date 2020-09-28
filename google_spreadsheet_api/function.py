@@ -105,32 +105,39 @@ def get_list_of_sheet_title(gsheet_id: str):
     return list_of_sheet_title
 
 
-def get_test(gsheet_id: str):
-    sheet_metadata = service().spreadsheets().get(spreadsheetId=gsheet_id).execute()
-    sheets = sheet_metadata.get('sheets', '')
-    result = sheets.values()
-    print(result)
+def creat_new_sheet_and_update_data_from_df(df: object, gsheet_id: str, new_sheet_name: str):
+    '''
 
-    # values = result.get('values', [])
-    return result
+    :param df: dataframe column_type: not date_time and fillna before update value to gsheet, Eg: df.fillna(value='None').astype({"created_at": 'str'})
+    :param gsheet_id:
+    :param new_sheet_name:
+    :return:
+    '''
+    column_name = df.columns.values.tolist()
+    list_result = df.values.tolist()  # transfer data_frame to 2D list
+    list_result.insert(0, column_name)
 
-    # sheet = service().spreadsheets()
-    # result = sheet.values().get(spreadsheetId=gsheet_id,
-    #                             range=sheet_name).execute()
-    # values = result.get('values', [])
+    add_sheet(gsheet_id, new_sheet_name)
+    range_to_update = f"{new_sheet_name}!A1"
+    update_value(list_result, range_to_update, gsheet_id)  # validate_value type: object, int, category... NOT DATETIME
+    return print("\n complete create new sheet and update data")
+
+
+def create_new_gsheet(new_gsheet_title: str):
+    spreadsheet = {
+        'properties': {
+            'title': new_gsheet_title
+        }
+    }
+    spreadsheet = service().spreadsheets().create(body=spreadsheet,
+                                                  fields='spreadsheetId').execute()
+    print('https://docs.google.com/spreadsheets/d/{0}'.format(spreadsheet.get('spreadsheetId')))
+    return spreadsheet.get('spreadsheetId')
+
 
 # if __name__ == "__main__":
 #     pd.set_option("display.max_rows", 100, "display.max_columns", 15, 'display.width', 1000)
 #
 #     # INPUT HERE:
-#     # Input_url 'https://docs.google.com/spreadsheets/d/1Hf8F6o-UMZZix22U-PUqMF31zOLKEM7L5sD7Xuwbpm8/edit#gid=1133448069'
-#
-#     gsheet_id = '1s7kNSz_dF_k7dVxMpSezKdENCbnYpf5mgSiDpiOs0Mw'  # AT page
-#     sheet_name = 'MP3X'
-#
-#
-#     # start tool:
-#     # get_list_of_sheet_title(gsheet_id)
-#
-#
-#     gspread_values(gsheet_id, 'MP3X')
+#     title = 'joy xinh'
+#     print(create_new_gsheet(title))

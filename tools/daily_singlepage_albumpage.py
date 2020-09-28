@@ -255,7 +255,7 @@ if __name__ == "__main__":
     # Start tool:
     # upload_album_wiki()
     # upload_track_wiki()
-    upload_track_lyrics()
+    # upload_track_lyrics()
 
 
     # crawl_artist_image_singlepage()

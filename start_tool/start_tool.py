@@ -1,11 +1,15 @@
-from tools.artistpage_justin import check_box,gsheet_id
 import time
 
 if __name__ == "__main__":
     start_time = time.time()
 
-    # Artist_page check_box: 17J5nC9HnX53U5htuxZVAsKFPh3SCaZaZ7iMKXtE44D8
-    gsheet_id
-    check_box()
+    # Artist_page check_box:
+    #     from tools.artistpage_justin import check_box
+    #     check_box()
+
+    # Extract artist_name for collecting from youtube
+    from tools.daily_export_artist_contribution import export_artist_contribution
+
+    export_artist_contribution()
 
     print("--- %s seconds ---" % (time.time() - start_time))
