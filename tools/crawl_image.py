@@ -12,7 +12,8 @@ def craw_image(gsheet_id, sheet_name):
         & (df.artist_uuid != '')
         & (df.artist_url_to_add.notnull())
         & (df.artist_url_to_add != '')
-    ][['artist_url_to_add','artist_uuid']].drop_duplicates(subset='artist_uuid', keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+        ][['artist_url_to_add', 'artist_uuid']].drop_duplicates(subset='artist_uuid',
+                                                                keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
     artist_row_index = artist_filter_df.index
 
     # album_filter_df = df[
@@ -24,7 +25,6 @@ def craw_image(gsheet_id, sheet_name):
     # album_row_index = album_filter_df.index
 
     with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
-
         for i in artist_row_index:
             x = artist_filter_df['artist_uuid'].loc[i]
             y = artist_filter_df['artist_url_to_add'].loc[i]
@@ -37,16 +37,11 @@ def craw_image(gsheet_id, sheet_name):
         #     print(query)
         # f.write(query + "\n")
 
-
-
-            # if albums_uuid == '':
-            #     continue
-            # else:
-            #     query2 = query + f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{albums_uuid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{albums_url}','$.object_type','artist','$.when_exists','replace','$.PIC','Joy_xinh'),99) ;\n"
-            #     print(query2)
-
-
-
+        # if albums_uuid == '':
+        #     continue
+        # else:
+        #     query2 = query + f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{albums_uuid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{albums_url}','$.object_type','artist','$.when_exists','replace','$.PIC','Joy_xinh'),99) ;\n"
+        #     print(query2)
 
         # f.write(query + "\n")
 

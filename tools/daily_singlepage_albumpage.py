@@ -244,19 +244,18 @@ if __name__ == "__main__":
     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
     # INPUT HERE:
     # Input_url 'https://docs.google.com/spreadsheets/d/1vimk9rzzCqx0ySs5NjiT3mipdLGec8-uGdIvOKmpm5w/edit#gid=1785798566'
-    # gsheet_id = '1vimk9rzzCqx0ySs5NjiT3mipdLGec8-uGdIvOKmpm5w'  # Album page
-    # sheet_name = '21.09.2020'
+    gsheet_id = '1vimk9rzzCqx0ySs5NjiT3mipdLGec8-uGdIvOKmpm5w'  # Album page
+    sheet_name = '21.09.2020'
 
     # Input_url 'https://docs.google.com/spreadsheets/d/1t5xEB4Rl1--CVp6CiZzZF-J9FiYAiFizvACUVEPpauk/edit#gid=0'
-    gsheet_id = '1t5xEB4Rl1--CVp6CiZzZF-J9FiYAiFizvACUVEPpauk'  # Single page
-    sheet_name = '21.09.2020'
+    # gsheet_id = '1t5xEB4Rl1--CVp6CiZzZF-J9FiYAiFizvACUVEPpauk'  # Single page
+    # sheet_name = '21.09.2020'
     # print(joy)
 
     # Start tool:
     # upload_album_wiki()
     # upload_track_wiki()
     # upload_track_lyrics()
-
 
     # crawl_artist_image_singlepage()
     # crawl_artist_image_albumpage()
