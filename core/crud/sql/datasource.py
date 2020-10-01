@@ -23,7 +23,7 @@ def get_datasourceid_from_youtube_url_and_trackid(youtube_url: str, trackid: str
 
 
 def remove_datasourceid():
-    datasourceid = (db_session.query(DataSource.id, PlaylistDataSource.playlist_id, UserNarrative.id.label('narrative_id'))
+    datasourceid = (db_session.query(PlaylistDataSource.playlist_id, UserNarrative.id.label('narrative_id'))
                     .select_from(DataSource)
                     .outerjoin(PlaylistDataSource,
                                PlaylistDataSource.datasource_id == DataSource.id)
@@ -37,4 +37,5 @@ def remove_datasourceid():
 if __name__ == "__main__":
     joy = get_datasourceid_from_youtube_url_and_trackid('https://www.youtube.com/watch?v=oOIJecsnaWg','3CC450E5DE2D4E8BB18264375A8C9816')
     joy_xinh = remove_datasourceid().all()
+    list(chain.from_iterable(joy_xinh))
     print(joy_xinh)

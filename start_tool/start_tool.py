@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # export_artist_contribution()
 
     # Extract wiki, lyric single_page, album_page: comment
-    from tools.daily_singlepage_albumpage import upload_album_wiki, upload_track_wiki, upload_track_lyrics
+    # from tools.daily_singlepage_albumpage import upload_album_wiki, upload_track_wiki, upload_track_lyrics
 
     # upload_album_wiki()
     # upload_track_wiki()
@@ -20,7 +20,6 @@ if __name__ == "__main__":
 
     # gsheet_id = '1nO49CqcUj6_mBbPBi-liZ_UYolG2ylXdCfzVons6GnM'  # Album page
     # sheet_name = '28.09.2020'
-
     # gsheet_id = '15kQ54Ea7NYo-EoTkRhLC1-SxO4bAIodEFizely7FTkI'  # Single page
     # sheet_name = '28.09.2020'
 
