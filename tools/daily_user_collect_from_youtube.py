@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 1000)
     start_time1 = time.time()
-    print(get_df_from_query(collect_from_youtube_query('2020-09-17')))
+    print(get_df_from_query(collect_from_youtube_query('2020-09-30')))
     cutoff_date = get_cutoff_date_collect_from_youtube().first().created_at
 
     joy_xinh = input(f"\n CUT OFF DATE: {cutoff_date} True or False: ")

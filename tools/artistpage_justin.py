@@ -400,7 +400,10 @@ def process_MP_4():
             old_youtube_url = mp4_file_to_process.MP4_link.loc[i]
 
             if memo == "not ok" and new_youtube_url == "none":
+
                 print(trackid, '---', new_youtube_url, '---', old_youtube_url)
+
+
             else:
                 continue
 
@@ -428,5 +431,4 @@ if __name__ == "__main__":
     # Start tools:
     check_box()
     # process_MP_4()
-
     print("--- %s seconds ---" % (time.time() - start_time))

@@ -143,7 +143,8 @@ def crawl_live_essential_youtube():
             youtube_url = filter_df.youtube_url.loc[i]
             # print(s.translate(str.maketrans({'o': 'O', 't': 'T'})))
 
-            place = filter_df.live_festival_not_include_date.loc[i].translate(str.maketrans({'\"': '\\\"', '\'': '\\\''}))
+            place = filter_df.live_festival_not_include_date.loc[i].translate(
+                str.maketrans({'\"': '\\\"', '\'': '\\\''}))
             year = filter_df.year.loc[i]
             artist_cover = filter_df.artist_cover.loc[i].translate(str.maketrans({'\"': '\\\"', '\'': '\\\''}))
             action_type = filter_df.action_type.loc[i]
@@ -207,7 +208,8 @@ def finalize_data():
     # Playlist_id
     df_playlist_id = original_live_essential.drop_duplicates(subset='artist_of_the_collection',
                                                              keep='first').reset_index(drop=True)
-    df_playlist_id['playlist_id'] = df_playlist_id.apply(lambda x: get_uuid4(),axis=1)  # get value for each row with pandas
+    df_playlist_id['playlist_id'] = df_playlist_id.apply(lambda x: get_uuid4(),
+                                                         axis=1)  # get value for each row with pandas
     df_playlist_id = df_playlist_id[['playlist_id', 'artist_of_the_collection']]
     df_playlist_id['PlaylistName'] = "Live Essentials : " + df_playlist_id['artist_of_the_collection'].str.title()
     df_playlist_id = pd.merge(original_live_essential.artist_of_the_collection, df_playlist_id, how='left',
@@ -277,12 +279,16 @@ def update_date_live_essential():
         ['status', 'user_uuid', 'artist_uuid', 'genre_uuid', 'PlaylistName', 'playlist_id', 'datasource_id',
          'youtube_url', 'live_festival_not_include_date', 'rank', 'year', 'stadium_place', 'country', 'city',
          'tempo']]
-    df = df.loc[:, ~df.columns.duplicated()]   # remove duplicate column
+    df = df.loc[:, ~df.columns.duplicated()]  # remove duplicate column
     filter_df = df[(df.status == "ok")]
-    essential_datasource = filter_df[['playlist_id', 'datasource_id','youtube_url', 'live_festival_not_include_date', 'rank', 'year', 'stadium_place', 'country', 'city','tempo']]
+    essential_datasource = filter_df[
+        ['playlist_id', 'datasource_id', 'youtube_url', 'live_festival_not_include_date', 'rank', 'year',
+         'stadium_place', 'country', 'city', 'tempo']]
     essential_datasource_row_index = essential_datasource.index
 
-    essential_playlist = filter_df[['playlist_id', 'user_uuid', 'artist_uuid', 'PlaylistName', 'genre_uuid','rank']].drop_duplicates(subset='playlist_id',keep="first")
+    essential_playlist = filter_df[
+        ['playlist_id', 'user_uuid', 'artist_uuid', 'PlaylistName', 'genre_uuid', 'rank']].drop_duplicates(
+        subset='playlist_id', keep="first")
     essential_playlist_row_index = essential_playlist.index
     query = ""
     with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
@@ -299,16 +305,19 @@ def update_date_live_essential():
             playlist_id = essential_datasource.playlist_id.loc[j]
             datasource_id = essential_datasource.datasource_id.loc[j]
             youtube_url = essential_datasource.youtube_url.loc[j]
-            festival = essential_datasource.live_festival_not_include_date.loc[j].translate(str.maketrans({'\"': '\\\"', '\'': '\\\''}))
+            festival = essential_datasource.live_festival_not_include_date.loc[j].translate(
+                str.maketrans({'\"': '\\\"', '\'': '\\\''}))
             rank = essential_datasource['rank'].loc[j]
             year = essential_datasource['year'].loc[j]
-            stadium_place = essential_datasource.stadium_place.loc[j].translate(str.maketrans({'\"': '\\\"', '\'': '\\\''}))
+            stadium_place = essential_datasource.stadium_place.loc[j].translate(
+                str.maketrans({'\"': '\\\"', '\'': '\\\''}))
             country = essential_datasource.country.loc[j].translate(str.maketrans({'\"': '\\\"', '\'': '\\\''}))
             city = essential_datasource.city.loc[j].translate(str.maketrans({'\"': '\\\"', '\'': '\\\''}))
             tempo = essential_datasource.tempo.loc[j].translate(str.maketrans({'\"': '\\\"', '\'': '\\\''}))
             query = query + f"INSERT into essential_playlist_datasource (`PlaylistId`,`DatasourceId`,`SourceURI`,`Festival`,`Rank`,`LiveDate`,`StadiumPlace`,`Country`,`StateCity`,`Tempo`) VALUES ('{playlist_id}','{datasource_id}','{youtube_url}','{festival}','{rank}','{year}','{stadium_place}','{country}','{city}','{tempo}');\n"
         print(query)
         f.write(query)
+
 
 if __name__ == "__main__":
     pd.set_option("display.max_rows", None, "display.max_columns", 80, 'display.width', 1000)
@@ -317,18 +326,17 @@ if __name__ == "__main__":
     # Input_url 'https://docs.google.com/spreadsheets/d/1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg/edit#gid=1528761728&fvid=146755164'
     gsheet_id = '1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg'  # Single page
     sheet_name = 'Sep - W1'
-    original_live_essential = get_df_from_speadsheet(gsheet_id, sheet_name).fillna(value='None').applymap(str.lower).apply(lambda x: x.str.strip())
+    original_live_essential = get_df_from_speadsheet(gsheet_id, sheet_name).fillna(value='None').applymap(
+        str.lower).apply(lambda x: x.str.strip())
 
     # PROCESS HERE:
     # check_box()
     # crawl_itune_album()
     # check_crawl_E5_06_status()
     # check_get_trackid_from_ituneid_and_tracknum()
-    # crawl_live_essential_youtube()
+    crawl_live_essential_youtube()
 
     # get_datasourceid()
     # finalize_data()
     # update_date_live_essential()
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))
-
-

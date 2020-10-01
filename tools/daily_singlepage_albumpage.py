@@ -3,14 +3,16 @@ from core.crud.sql.track import get_track_wiki, get_track_lyric
 from core.crud.sql.crawlingtask import get_crawl_artist_image_status, get_artist_image_cant_crawl
 from core.crud.get_df_from_query import get_df_from_query
 
-from google_spreadsheet_api.function import add_sheet
-from google_spreadsheet_api.function import update_value
-from google_spreadsheet_api.function import get_df_from_speadsheet
+from google_spreadsheet_api.function import add_sheet, get_list_of_sheet_title, update_value, get_df_from_speadsheet
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
 import time
 import pandas as pd
 import numpy as np
+
+gsheet_id = input(f"\n Input gsheet_id: ").strip()
+sheet_name = input(f"\n Input sheet_name: ").strip()
+list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
 
 
 def upload_album_wiki():
@@ -22,8 +24,11 @@ def upload_album_wiki():
 
     time.sleep(3)
     print("\n Updating data")
-    creat_new_sheet_and_update_data_from_df(df_album_wiki, gsheet_id, 'wiki')
 
+    if 'wiki' in list_of_sheet_title:
+        update_value(df_album_wiki.values.tolist(),'wiki!A2',gsheet_id)
+    else:
+        creat_new_sheet_and_update_data_from_df(df_album_wiki,gsheet_id,'wiki')
 
 def upload_track_wiki():
     # Step 1: get data
@@ -124,7 +129,7 @@ def crawl_artist_image_albumpage():
             x = filter_df['Artist_UUID'].loc[i]
             y = filter_df['image_url'].loc[i]
             query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{x}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{y}','$.object_type',\"artist\",'$.when_exists',\"replace\",'$.PIC',\"Joy_xinh\"),99);"
-            print(query)
+            # print(query)
             f.write(query + "\n")
 
     # STEP 2: automation check crawl_artist_image_status then export result:
@@ -233,7 +238,7 @@ def update_wiki_albumpage():
                 else:
                     query = query
                 f.write(joy_xinh + "\n" + query + "\n")
-                print(query)
+                # print(query)
 
         # Step 3: update gsheet
         update_wiki_result_to_gsheet()
@@ -244,8 +249,8 @@ if __name__ == "__main__":
     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
     # INPUT HERE:
     # Input_url 'https://docs.google.com/spreadsheets/d/1vimk9rzzCqx0ySs5NjiT3mipdLGec8-uGdIvOKmpm5w/edit#gid=1785798566'
-    gsheet_id = '1vimk9rzzCqx0ySs5NjiT3mipdLGec8-uGdIvOKmpm5w'  # Album page
-    sheet_name = '21.09.2020'
+    # gsheet_id = '1vimk9rzzCqx0ySs5NjiT3mipdLGec8-uGdIvOKmpm5w'  # Album page
+    # sheet_name = '21.09.2020'
 
     # Input_url 'https://docs.google.com/spreadsheets/d/1t5xEB4Rl1--CVp6CiZzZF-J9FiYAiFizvACUVEPpauk/edit#gid=0'
     # gsheet_id = '1t5xEB4Rl1--CVp6CiZzZF-J9FiYAiFizvACUVEPpauk'  # Single page
@@ -253,7 +258,7 @@ if __name__ == "__main__":
     # print(joy)
 
     # Start tool:
-    # upload_album_wiki()
+    upload_album_wiki()
     # upload_track_wiki()
     # upload_track_lyrics()
 
