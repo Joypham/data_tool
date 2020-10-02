@@ -6,7 +6,8 @@ import pandas as pd
 from core.crud.sqlalchemy import get_cutoff_date_collect_from_youtube
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
-if __name__ == "__main__":
+
+def daily_user_collect_from_youtube():
     # INPUT HERE:
     # Input_url 'https://docs.google.com/spreadsheets/d/1vlMsEjwBWuuxXecadJsEbBFeuVFAHZSbOz90JhXgioo/edit#gid=1088561556'
     gsheet_id = '1vlMsEjwBWuuxXecadJsEbBFeuVFAHZSbOz90JhXgioo'
@@ -19,23 +20,16 @@ if __name__ == "__main__":
 
     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 1000)
     start_time1 = time.time()
-    print(get_df_from_query(collect_from_youtube_query('2020-09-30')))
     cutoff_date = get_cutoff_date_collect_from_youtube().first().created_at
+    df = get_df_from_query(collect_from_youtube_query())
+    df = df.fillna(value='None').astype({"created_at": 'str'})
 
-    joy_xinh = input(f"\n CUT OFF DATE: {cutoff_date} True or False: ")
-    if joy_xinh == '1':
-        df = get_df_from_query(collect_from_youtube_query(cutoff_date))
-        df = df.fillna(value='None').astype({"created_at": 'str'})
-
-    else:
-        manual_cutoff_date = input(f"\n MANUAL CUT OFF DATE:")
-        df = get_df_from_query(collect_from_youtube_query(manual_cutoff_date))
-        df = df.fillna(value='None')
-
-    print(df.dtypes)
     print("\n", "Get data result \n", df)
-
     # STEP 2: Create sheet and update data to sheet
     creat_new_sheet_and_update_data_from_df(df, gsheet_id, new_title)
 
     print("\n --- %s seconds ---" % (time.time() - start_time1))
+
+
+if __name__ == "__main__":
+    daily_user_collect_from_youtube()

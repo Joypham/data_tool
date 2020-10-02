@@ -7,6 +7,7 @@ from core.crud.sqlalchemy import get_compiled_raw_mysql
 from core.models.datasource import DataSource
 from core.models.playlist_datasource import PlaylistDataSource
 from core.models.usernarrative import UserNarrative
+from itertools import chain
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
@@ -36,6 +37,8 @@ def remove_datasourceid():
 
 if __name__ == "__main__":
     joy = get_datasourceid_from_youtube_url_and_trackid('https://www.youtube.com/watch?v=oOIJecsnaWg','3CC450E5DE2D4E8BB18264375A8C9816')
-    joy_xinh = remove_datasourceid().all()
-    list(chain.from_iterable(joy_xinh))
+    # joy_xinh = remove_datasourceid().all()
+
+    # k = list(chain.from_iterable(joy_xinh))
     print(joy_xinh)
+
