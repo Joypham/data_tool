@@ -1,1 +1,0 @@
-insert into crawlingtasks(Id, ActionId, TaskDetail, Priority) values (uuid4(), '3FFA9CB0E221416288ACFE96B5810BD2',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.artist_id','1419227'),999) ;

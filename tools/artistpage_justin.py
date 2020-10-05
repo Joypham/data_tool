@@ -1,6 +1,10 @@
 from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title,update_value
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
+
+from core.crud.sql.datasource import get_datasourceid_from_youtube_url_and_trackid, related_datasourceid
+
 from tools import get_uuid4
+from itertools import chain
 import pandas as pd
 import time
 
@@ -400,10 +404,21 @@ def process_MP_4():
             old_youtube_url = mp4_file_to_process.MP4_link.loc[i]
 
             if memo == "not ok" and new_youtube_url == "none":
-
                 print(trackid, '---', new_youtube_url, '---', old_youtube_url)
+                datasourceids = get_datasourceid_from_youtube_url_and_trackid(old_youtube_url,trackid).all()
+                datasourceids_flatten_list = tuple(set(list(chain.from_iterable(datasourceids))))                       # flatten list
+                print(datasourceids_flatten_list)
 
-
+                related_id_datasource = related_datasourceid(get_datasourceid_from_youtube_url_and_trackid(old_youtube_url,trackid)).all()
+                flatten_list = list(set(list(chain.from_iterable(related_id_datasource))))                              # flatten list
+                flatten_list_remove_none = list(filter(lambda x: x is not None, flatten_list))
+                # print(len(flatten_list_remove_none))
+                with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+                    query = ""
+                    if len(flatten_list_remove_none) == 0:  # Not exist in related table
+                        query = f"Update datasources set valid = -10 where id in {datasourceids_flatten_list};"
+                        print(query)
+                        # f.write(query + "\n")
             else:
                 continue
 
@@ -429,6 +444,6 @@ if __name__ == "__main__":
     gsheet_id = '1k1-qrQxZV00ImOsdUv7nsONQBTc_5_45-T580AfTkEc'
 
     # Start tools:
-    check_box()
-    # process_MP_4()
+    # check_box()
+    process_MP_4()
     print("--- %s seconds ---" % (time.time() - start_time))

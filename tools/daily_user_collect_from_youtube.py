@@ -20,7 +20,6 @@ def daily_user_collect_from_youtube():
 
     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 1000)
     start_time1 = time.time()
-    cutoff_date = get_cutoff_date_collect_from_youtube().first().created_at
     df = get_df_from_query(collect_from_youtube_query())
     df = df.fillna(value='None').astype({"created_at": 'str'})
 
