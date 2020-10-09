@@ -10,6 +10,7 @@ import time
 import pandas as pd
 import numpy as np
 
+
 # gsheet_id = input(f"\n Input gsheet_id: ").strip()
 # sheet_name = input(f"\n Input sheet_name: ").strip()
 # list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
@@ -26,9 +27,10 @@ def upload_album_wiki():
     print("\n Updating data")
 
     if 'wiki' in list_of_sheet_title:
-        update_value(df_album_wiki.values.tolist(),'wiki!A2',gsheet_id)
+        update_value(df_album_wiki.values.tolist(), 'wiki!A2', gsheet_id)
     else:
-        creat_new_sheet_and_update_data_from_df(df_album_wiki,gsheet_id,'wiki')
+        creat_new_sheet_and_update_data_from_df(df_album_wiki, gsheet_id, 'wiki')
+
 
 def upload_track_wiki():
     # Step 1: get data
@@ -164,8 +166,11 @@ def update_wiki_result_to_gsheet():  # both single page and album page
     df_wiki = get_df_from_speadsheet(gsheet_id, sheet_name)
 
     conditions = [  # create a list of condition => if true =>> update value tương ứng
-        ((df_wiki['memo'] == 'not ok') | (df_wiki['memo'] == 'added')) & (df_wiki.content_to_add != 'none') & (df_wiki.url_to_add != 'none') & (df_wiki.content_to_add != '') & (df_wiki.url_to_add != ''),
-        ((df_wiki['memo'] == 'not ok') | (df_wiki['memo'] == 'added')) & ((df_wiki.content_to_add == 'none') | (df_wiki.url_to_add == 'none') | (df_wiki.content_to_add == '') | (df_wiki.url_to_add == '')),
+        ((df_wiki['memo'] == 'not ok') | (df_wiki['memo'] == 'added')) & (df_wiki.content_to_add != 'none') & (
+                    df_wiki.url_to_add != 'none') & (df_wiki.content_to_add != '') & (df_wiki.url_to_add != ''),
+        ((df_wiki['memo'] == 'not ok') | (df_wiki['memo'] == 'added')) & (
+                    (df_wiki.content_to_add == 'none') | (df_wiki.url_to_add == 'none') | (
+                        df_wiki.content_to_add == '') | (df_wiki.url_to_add == '')),
         True]
     values = ['wiki added', 'remove wiki', None]  # create a list of the values tương ứng với conditions ơ trên
     df_wiki['joy xinh'] = np.select(conditions,
@@ -195,7 +200,7 @@ def update_wiki_singlepage():
         # print(row_index)
         with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
             for i in row_index:
-                uuid = df_wiki_filter.uuid.loc[i]
+                id = df_wiki_filter.id.loc[i]
                 url = df_wiki_filter.url_to_add.loc[i]
                 content = df_wiki_filter.content_to_add.loc[i].replace('\'', '\\\'').replace("\"", "\\\"")
 
@@ -245,23 +250,19 @@ def update_wiki_albumpage():
 
 
 if __name__ == "__main__":
-
-
     start_time = time.time()
     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
     # INPUT HERE:
     # Input_url 'https://docs.google.com/spreadsheets/d/1nO49CqcUj6_mBbPBi-liZ_UYolG2ylXdCfzVons6GnM'
-    gsheet_id = '1nO49CqcUj6_mBbPBi-liZ_UYolG2ylXdCfzVons6GnM'  # Album page
-    sheet_name = '28.09.2020'
+    # gsheet_id = '1-CS0kfwdd5uCu8FmlYX9jna2IZTZGkrCpVh9wt2geT8'  # Album page
+    # sheet_name = '05.10.2020'
 
-
-    # Input_url 'https://docs.google.com/spreadsheets/d/1t5xEB4Rl1--CVp6CiZzZF-J9FiYAiFizvACUVEPpauk/edit#gid=0'
-    # gsheet_id = '15kQ54Ea7NYo-EoTkRhLC1-SxO4bAIodEFizely7FTkI'  # Single page
-    # sheet_name = '28.09.2020'
+    # Input_url 'https://docs.google.com/spreadsheets/d/15kQ54Ea7NYo-EoTkRhLC1-SxO4bAIodEFizely7FTkI'
+    gsheet_id = '1jJSiQZmC_lZ-pMwse1CANfz3xdmKtcXRAdueYqdD_y8'  # Single page
+    sheet_name = '05.10.2020'
 
     list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
     # print(joy)
-
     # Start tool:
     # upload_album_wiki()
     # upload_track_wiki()
@@ -270,6 +271,6 @@ if __name__ == "__main__":
     # crawl_artist_image_singlepage()
     # crawl_artist_image_albumpage()
     # update_wiki_singlepage()
-    update_wiki_albumpage()
+    # update_wiki_albumpage()
 
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))

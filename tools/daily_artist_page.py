@@ -27,8 +27,8 @@ if __name__ == "__main__":
     start_time = time.time()
     pd.set_option("display.max_rows", None, "display.max_columns", 60, 'display.width', 1000)
     # INPUT HERE
-    # 'https://docs.google.com/spreadsheets/d/18_xS2CK2sYMbIfDLEPtH2gS4s_CR9gwVeby18rnYrsQ/edit#gid=687333844&fvid=447721726'
-    gsheet_id = '18_xS2CK2sYMbIfDLEPtH2gS4s_CR9gwVeby18rnYrsQ'
+    # 'https://docs.google.com/spreadsheets/d/1-PYSxa9cy7tqsRCaOYs3GQPFWd0Vbv5V1f3InYHVMGI/edit#gid=0'
+    gsheet_id = '1-PYSxa9cy7tqsRCaOYs3GQPFWd0Vbv5V1f3InYHVMGI'
     sheet_name = 'Artist List'
 
     crawl_artist_album_from_artist_ituneid()
