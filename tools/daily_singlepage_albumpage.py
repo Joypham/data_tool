@@ -81,6 +81,9 @@ def automate_check_crawl_artist_image_status():  # need to optimize
 
 
 def crawl_artist_image_singlepage():
+    # new_sheet_name = 'artist image cant upload'
+    # if 'new_sheet_name' in list_of_sheet_title:
+
     # STEP 1: Get_query_to_crawl
     df = get_df_from_speadsheet(gsheet_id, sheet_name)
     filter_df = df[(df.Artist_UUID != 'ArtistName')  # filter df by conditions
@@ -106,7 +109,7 @@ def crawl_artist_image_singlepage():
     artist_uuid = filter_df['Artist_UUID'].tolist()
     df_artist_image_cant_upload = get_df_from_query(get_artist_image_cant_crawl(artist_uuid))
     joy = df_artist_image_cant_upload['name'].tolist() == []
-    new_sheet_name = 'artist image cant upload joy test'
+
     if joy == 1:
         list_result = [['Upload thành công 100% nhé các em ^ - ^']]
         add_sheet(gsheet_id, new_sheet_name)
@@ -116,38 +119,45 @@ def crawl_artist_image_singlepage():
 
 
 def crawl_artist_image_albumpage():
-    # STEP 1: Get_query_to_crawl
-    df = get_df_from_speadsheet(gsheet_id, sheet_name)
-    filter_df = df[(df.A12 == 'missing')  # filter df by conditions
-                   & (df.image_url.notnull())
-                   & (df.image_url != '')
-                   ].reset_index().drop_duplicates(subset=['Artist_UUID'],
-                                                   keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
-    print("List artist to crawl image \n ", filter_df[['ArtistName', 'Artist_UUID', 'A12', 'image_url']], "\n")
+    new_sheet_name = 'artist image cant upload'
+    if new_sheet_name in list_of_sheet_title:
+        filter_df = get_df_from_speadsheet(gsheet_id, new_sheet_name)
+        print("List artist to crawl image \n ", filter_df, "\n")
+    else:
+
+
+    # # STEP 1: Get_query_to_crawl
+        df = get_df_from_speadsheet(gsheet_id, sheet_name)
+        filter_df = df[(df.A12 == 'missing')  # filter df by conditions
+                       & (df.artist_image_url_to_add.notnull())
+                       & (df.artist_image_url_to_add != '')
+                       ].reset_index().drop_duplicates(subset=['Artist_UUID'],
+                                                       keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+        print("List artist to crawl image \n ", filter_df[['ArtistName', 'Artist_UUID', 'A12', 'artist_image_url_to_add']],"\n")
 
     row_index = filter_df.index
     with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
         for i in row_index:
             x = filter_df['Artist_UUID'].loc[i]
-            y = filter_df['image_url'].loc[i]
+            y = filter_df['artist_image_url_to_add'].loc[i]
             query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{x}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{y}','$.object_type',\"artist\",'$.when_exists',\"replace\",'$.PIC',\"Joy_xinh\"),99);"
-            # print(query)
             f.write(query + "\n")
 
-    # STEP 2: automation check crawl_artist_image_status then export result:
+    # # STEP 2: automation check crawl_artist_image_status then export result:
     automate_check_crawl_artist_image_status()
-
-    # STEP 3: upload artist image cant upload
+    #
+    # # STEP 3: upload artist image cant upload
     artist_uuid = filter_df['Artist_UUID'].tolist()
-    df_artist_image_cant_upload = get_df_from_query(get_artist_image_cant_crawl(artist_uuid))
-    joy = df_artist_image_cant_upload['name'].tolist() == []
-    new_sheet_name = 'artist image cant upload joy test'
+    df_artist_image_cant_upload = get_df_from_query(get_artist_image_cant_crawl(artist_uuid)).reset_index().drop_duplicates(subset=['Artist_UUID'],keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+    joy = df_artist_image_cant_upload[(df_artist_image_cant_upload.status == 'incomplete')].Artist_UUID.tolist() == []
+
     if joy == 1:
-        list_result = [['Upload thành công 100% nhé các em ^ - ^']]
-        add_sheet(gsheet_id, new_sheet_name)
-        update_value(list_result, f"{new_sheet_name}!A1", gsheet_id)
+        raw_df_to_upload = {'status': ['Upload thành công 100% nhé các em ^ - ^']}
+        df_to_upload = pd.DataFrame(data=raw_df_to_upload)
     else:
-        creat_new_sheet_and_update_data_from_df(df_artist_image_cant_upload, gsheet_id, new_sheet_name)
+        df_to_upload = df_artist_image_cant_upload
+
+    creat_new_sheet_and_update_data_from_df(df_to_upload, gsheet_id, new_sheet_name)
 
 
 def check_wiki_before_update_data():  # both single page and album page
@@ -253,15 +263,17 @@ if __name__ == "__main__":
     start_time = time.time()
     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
     # INPUT HERE:
-    # Input_url 'https://docs.google.com/spreadsheets/d/1nO49CqcUj6_mBbPBi-liZ_UYolG2ylXdCfzVons6GnM'
-    # gsheet_id = '1-CS0kfwdd5uCu8FmlYX9jna2IZTZGkrCpVh9wt2geT8'  # Album page
-    # sheet_name = '05.10.2020'
+    # Input_url 'https://docs.google.com/spreadsheets/d/1-CS0kfwdd5uCu8FmlYX9jna2IZTZGkrCpVh9wt2geT8'
 
-    # Input_url 'https://docs.google.com/spreadsheets/d/15kQ54Ea7NYo-EoTkRhLC1-SxO4bAIodEFizely7FTkI'
-    gsheet_id = '1jJSiQZmC_lZ-pMwse1CANfz3xdmKtcXRAdueYqdD_y8'  # Single page
+    gsheet_id = '1-CS0kfwdd5uCu8FmlYX9jna2IZTZGkrCpVh9wt2geT8'  # Album page
     sheet_name = '05.10.2020'
 
+    # Input_url 'https://docs.google.com/spreadsheets/d/15kQ54Ea7NYo-EoTkRhLC1-SxO4bAIodEFizely7FTkI'
+    # gsheet_id = '1jJSiQZmC_lZ-pMwse1CANfz3xdmKtcXRAdueYqdD_y8'  # Single page
+    # sheet_name = '05.10.2020'
+
     list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
+    print(list_of_sheet_title)
     # print(joy)
     # Start tool:
     # upload_album_wiki()

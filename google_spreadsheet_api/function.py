@@ -72,6 +72,30 @@ def add_sheet(gsheet_id, sheet_name):
         print(e)
 
 
+def delete_sheet(gsheet_id, sheet_name):
+    sheet_id = get_sheet_id_from_sheet_title(gsheet_id, sheet_name)
+    try:
+        request_body = {
+            'requests': [{
+                'deleteSheet': {
+
+                    'sheetId': sheet_id
+
+                }
+            }
+            ]
+        }
+
+        response = service().spreadsheets().batchUpdate(
+            spreadsheetId=gsheet_id,
+            body=request_body
+        ).execute()
+
+        return response
+    except Exception as e:
+        print(e)
+
+
 def update_value(list_result: list, range_to_update: str, gsheet_id: str):
     body = {
         'values': list_result  # list_result is array 2 dimensional (2D)
@@ -131,7 +155,8 @@ def creat_new_sheet_and_update_data_from_df(df: object, gsheet_id: str, new_shee
 
         add_sheet(gsheet_id, new_sheet_name)
         range_to_update = f"{new_sheet_name}!A1"
-        update_value(list_result, range_to_update, gsheet_id)  # validate_value type: object, int, category... NOT DATETIME
+        update_value(list_result, range_to_update,
+                     gsheet_id)  # validate_value type: object, int, category... NOT DATETIME
     return print("\n complete create new sheet and update data")
 
 
@@ -147,9 +172,19 @@ def create_new_gsheet(new_gsheet_title: str):
     return spreadsheet.get('spreadsheetId')
 
 
+def get_sheet_id_from_sheet_title(gsheet_id: str, title: str):
+    sheet_metadata = service().spreadsheets().get(spreadsheetId=gsheet_id).execute()
+    sheets = sheet_metadata.get('sheets', '')
+    for i in sheets:
+        if i['properties']['title'] == title:
+            sheet_id = i['properties']['sheetId']
+            return sheet_id
+            break
+
+
 # if __name__ == "__main__":
-#     pd.set_option("display.max_rows", 100, "display.max_columns", 15, 'display.width', 1000)
-#
-#     # INPUT HERE:
-#     title = 'joy xinh'
-#     print(create_new_gsheet(title))
+    # gsheet_id = '1-CS0kfwdd5uCu8FmlYX9jna2IZTZGkrCpVh9wt2geT8'  # Album page
+    # title = 'artist image cant upload'
+    # title = 'test'
+    # delete_sheet(gsheet_id, title)
+    # k =get_sheet_id_from_sheet_title(gsheet_id, title)

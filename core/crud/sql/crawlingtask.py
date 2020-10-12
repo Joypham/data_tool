@@ -28,7 +28,7 @@ def get_crawl_artist_image_status():
 
 def get_artist_image_cant_crawl(artistuuid: list):
     artist_image_cant_crawl_single_page = (db_session.query(Artist.name,
-                                                            Artist.uuid,
+                                                            Artist.uuid.label("Artist_UUID"),
                                                             func.json_extract(Crawlingtask.taskdetail, "$.url").label(
                                                                 "image_url"),
                                                             Crawlingtask.status
@@ -38,9 +38,10 @@ def get_artist_image_cant_crawl(artistuuid: list):
                                                  Artist.uuid == Crawlingtask.objectid)
                                            .filter(func.DATE(Crawlingtask.created_at) == func.current_date(),
                                                    Crawlingtask.actionid == 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9',
-                                                   Crawlingtask.objectid.in_(artistuuid),
-                                                   Crawlingtask.status == 'incomplete'
+                                                   Crawlingtask.objectid.in_(artistuuid)
                                                    )
+                                           .order_by(Crawlingtask.objectid, Crawlingtask.created_at.desc())
+
                                            )
     return artist_image_cant_crawl_single_page
 
@@ -82,7 +83,6 @@ def get_datasourceId_from_crawlingtask():
                     func.DATE(Crawlingtask.created_at) == func.current_date(),
                       Crawlingtask.actionid == 'F91244676ACD47BD9A9048CF2BA3FFC1',
                       Crawlingtask.priority.in_([999, 10000])
-
                       )
               .group_by(Crawlingtask.objectid,func.json_extract(Crawlingtask.taskdetail, "$.youtube_url"),func.json_extract(Crawlingtask.taskdetail, "$.data_source_format_id"))
               )
@@ -90,6 +90,8 @@ def get_datasourceId_from_crawlingtask():
 
 
 if __name__ == "__main__":
-    # ituneid = ['F241DAA56E76411592789860AE809F5F', 'F241DAA56E76411592789860AE809F5F']
-    joy = get_compiled_raw_mysql(get_datasourceId_from_crawlingtask())
-    print(joy)
+    # artistuuid = ['F241DAA56E76411592789860AE809F5F', 'F241DAA56E76411592789860AE809F5F']
+    # joy = get_artist_image_cant_crawl(artistuuid)
+    joy = get_crawl_artist_image_status()
+    k = get_compiled_raw_mysql(joy)
+    print(k)
