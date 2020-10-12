@@ -182,9 +182,3 @@ def get_sheet_id_from_sheet_title(gsheet_id: str, title: str):
             break
 
 
-# if __name__ == "__main__":
-    # gsheet_id = '1-CS0kfwdd5uCu8FmlYX9jna2IZTZGkrCpVh9wt2geT8'  # Album page
-    # title = 'artist image cant upload'
-    # title = 'test'
-    # delete_sheet(gsheet_id, title)
-    # k =get_sheet_id_from_sheet_title(gsheet_id, title)

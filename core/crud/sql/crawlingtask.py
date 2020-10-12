@@ -22,6 +22,7 @@ def get_crawl_artist_image_status():
                                  .select_from(Crawlingtask)
                                  .filter(func.DATE(Crawlingtask.created_at) == func.current_date(),
                                          Crawlingtask.actionid == 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9')
+                                 .order_by(Crawlingtask.objectid, Crawlingtask.created_at.desc())
                                  )
     return crawl_artist_image_status
 
@@ -89,9 +90,9 @@ def get_datasourceId_from_crawlingtask():
     return record
 
 
-if __name__ == "__main__":
-    # artistuuid = ['F241DAA56E76411592789860AE809F5F', 'F241DAA56E76411592789860AE809F5F']
-    # joy = get_artist_image_cant_crawl(artistuuid)
-    joy = get_crawl_artist_image_status()
-    k = get_compiled_raw_mysql(joy)
-    print(k)
+# if __name__ == "__main__":
+#     # artistuuid = ['F241DAA56E76411592789860AE809F5F', 'F241DAA56E76411592789860AE809F5F']
+#     # joy = get_artist_image_cant_crawl(artistuuid)
+#     joy = get_artist_image_cant_crawl()
+#     k = get_compiled_raw_mysql(joy)
+#     print(k)
