@@ -171,16 +171,16 @@ def get_datasourceid():
 
     get_datasourceid = get_datasourceid[['format_id', 'datasource_id', 'crawler_status', 'crawlingtask_id', 'message']]
 
-    print(get_datasourceid)
-    if 'datasource_id' in raw_live_essential.columns:
-        pass
-    else:
-        column_name = get_datasourceid.columns.values.tolist()
-        list_result = get_datasourceid.values.tolist()  # transfer data_frame to 2D list
-        list_result.insert(0, column_name)
-        range_to_update = f"{sheet_name}!AG1"
-        update_value(list_result, range_to_update,
-                     gsheet_id)  # validate_value type: object, int, category... NOT DATETIME
+    # print(get_datasourceid)
+    # if 'datasource_id' in raw_live_essential.columns:
+    #     pass
+    # else:
+    column_name = get_datasourceid.columns.values.tolist()
+    list_result = get_datasourceid.values.tolist()  # transfer data_frame to 2D list
+    list_result.insert(0, column_name)
+    range_to_update = f"{sheet_name}!AG1"
+    update_value(list_result, range_to_update,
+                 gsheet_id)  # validate_value type: object, int, category... NOT DATETIME
 
     return get_datasourceid
 
@@ -218,7 +218,7 @@ def finalize_data():
     joy = pd.concat([genre_uuid, artist_uuid, user_uuid, df_playlist_id, raw_live_essential], axis=1)
     joy = joy[['user_uuid', 'artist_uuid', 'genre_uuid', 'PlaylistName', 'playlist_id', 'datasource_id', 'youtube_url',
                'live_festival_not_include_date', 'rank', 'year', 'stadium_place', 'country', 'country', 'tempo']]
-    print(joy)
+    # print(joy)
 
     column_name = joy.columns.values.tolist()
     list_result = joy.values.tolist()  # transfer data_frame to 2D list
@@ -280,7 +280,7 @@ def update_date_live_essential():
          'youtube_url', 'live_festival_not_include_date', 'rank', 'year', 'stadium_place', 'country', 'city',
          'tempo']]
     df = df.loc[:, ~df.columns.duplicated()]  # remove duplicate column
-    filter_df = df[(df.status == "ok")]
+    filter_df = df[(df.status == "ok") & (df.datasource_id != "None")]
     essential_datasource = filter_df[
         ['playlist_id', 'datasource_id', 'youtube_url', 'live_festival_not_include_date', 'rank', 'year',
          'stadium_place', 'country', 'city', 'tempo']]
@@ -325,7 +325,7 @@ if __name__ == "__main__":
     # INPUT HERE:
     # Input_url 'https://docs.google.com/spreadsheets/d/1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg/edit#gid=1528761728&fvid=146755164'
     gsheet_id = '1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg'  # Single page
-    sheet_name = 'Sep - W1'
+    sheet_name = 'Oct - W2'
     original_live_essential = get_df_from_speadsheet(gsheet_id, sheet_name).fillna(value='None').applymap(
         str.lower).apply(lambda x: x.str.strip())
 

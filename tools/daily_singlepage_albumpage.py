@@ -94,6 +94,7 @@ def crawl_artist_image_singlepage():
                        ].reset_index().drop_duplicates(subset=['Artist_UUID'],
                                                        keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
         print("List artist to crawl image \n ", filter_df[['ArtistName', 'Artist_UUID', 's12', 'artist_url_to_add']], "\n")
+
     # Step 2: get crawlingtask
     row_index = filter_df.index
     with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
@@ -105,19 +106,20 @@ def crawl_artist_image_singlepage():
 
     # Step 3: automation check crawl_artist_image_status then export result:
     automate_check_crawl_artist_image_status()
-
-    # Step 4: upload artist image cant upload
+    #
+    # # Step 4: upload artist image cant upload
     artist_uuid = filter_df['Artist_UUID'].tolist()
     df_artist_image_cant_upload = get_df_from_query(
         get_artist_image_cant_crawl(artist_uuid)).reset_index().drop_duplicates(subset=['Artist_UUID'],
                                                                                 keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+
     joy = df_artist_image_cant_upload[(df_artist_image_cant_upload.status == 'incomplete')].Artist_UUID.tolist() == []
 
     if joy == 1:
         raw_df_to_upload = {'status': ['Upload thành công 100% nhé các em ^ - ^']}
         df_to_upload = pd.DataFrame(data=raw_df_to_upload)
     else:
-        df_to_upload = df_artist_image_cant_upload
+        df_to_upload = df_artist_image_cant_upload[(df_artist_image_cant_upload.status == 'incomplete')]
 
     creat_new_sheet_and_update_data_from_df(df_to_upload, gsheet_id, new_sheet_name)
 
@@ -135,7 +137,8 @@ def crawl_artist_image_albumpage():
                        & (df.artist_url_to_add != '')
                        ].reset_index().drop_duplicates(subset=['Artist_UUID'],
                                                        keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
-        print("List artist to crawl image \n ", filter_df[['ArtistName', 'Artist_UUID', 'A12', 'artist_image_url_to_add']],"\n")
+        print("List artist to crawl image \n ", filter_df[['ArtistName', 'Artist_UUID', 'A12', 'artist_url_to_add']], "\n")
+
     # Step 2: get crawlingtask
     row_index = filter_df.index
     with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
@@ -157,7 +160,7 @@ def crawl_artist_image_albumpage():
         raw_df_to_upload = {'status': ['Upload thành công 100% nhé các em ^ - ^']}
         df_to_upload = pd.DataFrame(data=raw_df_to_upload)
     else:
-        df_to_upload = df_artist_image_cant_upload
+        df_to_upload = df_artist_image_cant_upload[(df_artist_image_cant_upload.status == 'incomplete')]
 
     creat_new_sheet_and_update_data_from_df(df_to_upload, gsheet_id, new_sheet_name)
 
@@ -265,26 +268,25 @@ if __name__ == "__main__":
     start_time = time.time()
     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
     # INPUT HERE:
-    # Input_url 'https://docs.google.com/spreadsheets/d/1-CS0kfwdd5uCu8FmlYX9jna2IZTZGkrCpVh9wt2geT8'
+    # Input_url 'https://docs.google.com/spreadsheets/d/1_bn4PHrBYoKuz3i07k6MpArVWKAfzjR1Box8xuHgw2Y/edit#gid=1874333891'
 
-    gsheet_id = '1-CS0kfwdd5uCu8FmlYX9jna2IZTZGkrCpVh9wt2geT8'  # Album page
-    sheet_name = '05.10.2020'
+    gsheet_id = '1_bn4PHrBYoKuz3i07k6MpArVWKAfzjR1Box8xuHgw2Y'  # Album page
+    sheet_name = '12.10.2020'
 
-    # Input_url 'https://docs.google.com/spreadsheets/d/15kQ54Ea7NYo-EoTkRhLC1-SxO4bAIodEFizely7FTkI'
-    # gsheet_id = '1jJSiQZmC_lZ-pMwse1CANfz3xdmKtcXRAdueYqdD_y8'  # Single page
-    # sheet_name = '05.10.2020'
+    # Input_url 'https://docs.google.com/spreadsheets/d/1KvEqg3eBfsiradWJwhhCE6G40YKrppXF6IBdRrZB5Po/edit#gid=0'
+    # gsheet_id = '1KvEqg3eBfsiradWJwhhCE6G40YKrppXF6IBdRrZB5Po'  # Single page
+    # sheet_name = '12.10.2020'
 
     list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
-    # print(list_of_sheet_title)
-    # print(joy)
+
     # Start tool:
     # upload_album_wiki()
     # upload_track_wiki()
     # upload_track_lyrics()
 
     # crawl_artist_image_singlepage()
-    crawl_artist_image_albumpage()
+    # crawl_artist_image_albumpage()
     # update_wiki_singlepage()
-    # update_wiki_albumpage()
+    update_wiki_albumpage()
 
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))

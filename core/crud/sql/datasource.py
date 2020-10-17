@@ -8,6 +8,8 @@ from core.models.datasource import DataSource
 from core.models.playlist_datasource import PlaylistDataSource
 from core.models.usernarrative import UserNarrative
 from core.models.collection_datasource import CollectionDataSource
+
+from typing import Optional, Tuple, Dict, List
 from itertools import chain
 
 from core.crud.get_df_from_query import get_df_from_query
@@ -17,8 +19,8 @@ engine = create_engine(SQLALCHEMY_DATABASE_URI)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 
-def get_all_by_ids(data_source_id: list[str]) -> list[DataSource]:
-    return db_session.query(DataSource).filter((DataSource.id.in_(data_source_id)) & (DataSource.valid == 1)).all()
+# def get_all_by_ids(data_source_id: list[str]) -> list[DataSource]:
+#     return db_session.query(DataSource).filter((DataSource.id.in_(data_source_id)) & (DataSource.valid == 1)).all()
 
 
 def get_datasourceid_from_youtube_url_and_trackid(youtube_url: str, trackid: str) -> DataSource:
@@ -48,7 +50,16 @@ def related_datasourceid(datasourceids: list):
                     )
     return datasourceid
 
-# if __name__ == "__main__":
+def get_all_datasource_valid() -> List[DataSource]:
+    return db_session.query(DataSource).filter((DataSource.valid == 1),
+                                               DataSource.format_id == '74BA994CF2B54C40946EA62C3979DDA3').order_by(DataSource.created_at.desc()).limit(10).all()
+
+if __name__ == "__main__":
+    db_datasources = get_all_datasource_valid()
+    for db_datasource in db_datasources:
+        print(db_datasource.id)
+
+
 #     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 1000)
 #     datasourceids = get_datasourceid_from_youtube_url_and_trackid('https://www.youtube.com/watch?v=xZUu3Q-YToE','BF1F3817A3B6458586991A7C80308299').all()
 #     datasourceids_flatten_list = tuple(set(list(chain.from_iterable(datasourceids))))  # flatten list
