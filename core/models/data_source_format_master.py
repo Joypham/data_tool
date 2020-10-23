@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.mutable import MutableDict
 
-from app.data.sql.models.base_class import Base
+from core.models.base_class import Base, TimestampMixin
 
 
 class DataSourceFormatMaster(Base):
@@ -13,13 +13,10 @@ class DataSourceFormatMaster(Base):
 
     FORMAT_ID_MP4_FULL = "74BA994CF2B54C40946EA62C3979DDA3"
     FORMAT_ID_MP4_STATIC = "C78F687CB3BE4D90B30F49435317C3AC"
-    # noinspection SpellCheckingInspection
     FORMAT_ID_MP4_LIVE = "7F8B6CD82F28437888BD029EFDA1E57F"
     FORMAT_ID_MP4_COVER = "F5D2FE4A15FB405E988A7309FD3F9920"
-    # noinspection SpellCheckingInspection
     FORMAT_ID_MP4_FEATURE = "408EEAB1D3CF41F3941F62F97372184F"
     FORMAT_ID_MP4_REMIX = "BB423826E6FA4839BBB4DA718F483D18"
-    # noinspection SpellCheckingInspection
     FORMAT_ID_MP4_LYRIC = "3CF047F3B0F349B3A9A39CE7FDAB1DA6"
 
     FORMAT_ID_MP3_FULL = "1A67A5F1E0D84FB9B48234AE65086375"

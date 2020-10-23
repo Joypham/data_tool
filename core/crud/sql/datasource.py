@@ -23,19 +23,19 @@ db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind
 #     return db_session.query(DataSource).filter((DataSource.id.in_(data_source_id)) & (DataSource.valid == 1)).all()
 
 
-def get_datasourceid_from_youtube_url_and_trackid(youtube_url: str, trackid: str) -> DataSource:
+def get_datasourceid_from_youtube_url_and_trackid(youtube_url: str, trackid: str, formatid: str):
     datasourceid = (db_session.query(DataSource.id)
                     .select_from(DataSource)
                     .filter(DataSource.valid == 1,
                             DataSource.track_id == trackid,
                             DataSource.source_uri == youtube_url,
-                            # DataSource.format_id == formatid
+                            DataSource.format_id == formatid
                             )
                     )
     return datasourceid
 
 
-def related_datasourceid(datasourceids: list):
+def related_datasourceid(datasourceid: str):
     # Checking if exist in related_table
     datasourceid = (db_session.query(PlaylistDataSource.playlist_id, UserNarrative.id.label('narrative_id'),
                                      CollectionDataSource.collection_uuid)
@@ -46,19 +46,21 @@ def related_datasourceid(datasourceids: list):
                                UserNarrative.content_json.like("%" + DataSource.id + "%"))
                     .outerjoin(CollectionDataSource,
                                CollectionDataSource.datasource_id == DataSource.id)
-                    .filter(DataSource.id.in_(datasourceids))
-                    )
+                    .filter(DataSource.id == datasourceid)
+                    ).all()
     return datasourceid
+
 
 def get_all_datasource_valid() -> List[DataSource]:
     return db_session.query(DataSource).filter((DataSource.valid == 1),
-                                               DataSource.format_id == '74BA994CF2B54C40946EA62C3979DDA3').order_by(DataSource.created_at.desc()).limit(10).all()
+                                               DataSource.format_id == '74BA994CF2B54C40946EA62C3979DDA3').order_by(
+        DataSource.created_at.desc()).limit(10).all()
+
 
 if __name__ == "__main__":
     db_datasources = get_all_datasource_valid()
     for db_datasource in db_datasources:
         print(db_datasource.id)
-
 
 #     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 1000)
 #     datasourceids = get_datasourceid_from_youtube_url_and_trackid('https://www.youtube.com/watch?v=xZUu3Q-YToE','BF1F3817A3B6458586991A7C80308299').all()

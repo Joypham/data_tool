@@ -268,16 +268,16 @@ if __name__ == "__main__":
     start_time = time.time()
     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
     # INPUT HERE:
-    # Input_url 'https://docs.google.com/spreadsheets/d/1_bn4PHrBYoKuz3i07k6MpArVWKAfzjR1Box8xuHgw2Y/edit#gid=1874333891'
+    # Input_url 'https://docs.google.com/spreadsheets/d/1Rj27fWa6mkQLjbMmutY1iVnRPpn5yqqIaa_iLmTTX7c/edit#gid=1919896055'
 
-    gsheet_id = '1_bn4PHrBYoKuz3i07k6MpArVWKAfzjR1Box8xuHgw2Y'  # Album page
-    sheet_name = '12.10.2020'
+    # gsheet_id = '1Rj27fWa6mkQLjbMmutY1iVnRPpn5yqqIaa_iLmTTX7c'  # Album page
+    # sheet_name = '19.10.2020'
 
-    # Input_url 'https://docs.google.com/spreadsheets/d/1KvEqg3eBfsiradWJwhhCE6G40YKrppXF6IBdRrZB5Po/edit#gid=0'
-    # gsheet_id = '1KvEqg3eBfsiradWJwhhCE6G40YKrppXF6IBdRrZB5Po'  # Single page
-    # sheet_name = '12.10.2020'
+    # Input_url 'https://docs.google.com/spreadsheets/d/1N3B0LiS7W5Uby3z5crWVeVuRaDxLeAHL0M7E99SHHr4/edit#gid=81564438'
+    gsheet_id = '1N3B0LiS7W5Uby3z5crWVeVuRaDxLeAHL0M7E99SHHr4'  # Single page
+    sheet_name = '19.10.2020'
 
-    list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
+    # list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
 
     # Start tool:
     # upload_album_wiki()
@@ -286,7 +286,7 @@ if __name__ == "__main__":
 
     # crawl_artist_image_singlepage()
     # crawl_artist_image_albumpage()
-    # update_wiki_singlepage()
-    update_wiki_albumpage()
+    update_wiki_singlepage()
+    # update_wiki_albumpage()
 
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))
