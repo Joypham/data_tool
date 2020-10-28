@@ -41,6 +41,8 @@ def checking_lost_datasource_image_from_S3(datasource_ids: list):
         # print(existing_on_s3(key, bucket=AWSConfig.S3_IMAGE_BUCKET))
 
 
+
+
 if __name__ == "__main__":
     datasource_ids = [
         "049429A3FCA64BAAB171385879BF9EE1",

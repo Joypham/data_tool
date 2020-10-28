@@ -270,12 +270,12 @@ if __name__ == "__main__":
     # INPUT HERE:
     # Input_url 'https://docs.google.com/spreadsheets/d/1Rj27fWa6mkQLjbMmutY1iVnRPpn5yqqIaa_iLmTTX7c/edit#gid=1919896055'
 
-    # gsheet_id = '1Rj27fWa6mkQLjbMmutY1iVnRPpn5yqqIaa_iLmTTX7c'  # Album page
-    # sheet_name = '19.10.2020'
+    gsheet_id = '1Rj27fWa6mkQLjbMmutY1iVnRPpn5yqqIaa_iLmTTX7c'  # Album page
+    sheet_name = '19.10.2020'
 
     # Input_url 'https://docs.google.com/spreadsheets/d/1N3B0LiS7W5Uby3z5crWVeVuRaDxLeAHL0M7E99SHHr4/edit#gid=81564438'
-    gsheet_id = '1N3B0LiS7W5Uby3z5crWVeVuRaDxLeAHL0M7E99SHHr4'  # Single page
-    sheet_name = '19.10.2020'
+    # gsheet_id = '1N3B0LiS7W5Uby3z5crWVeVuRaDxLeAHL0M7E99SHHr4'  # Single page
+    # sheet_name = '19.10.2020'
 
     # list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
 
@@ -286,7 +286,7 @@ if __name__ == "__main__":
 
     # crawl_artist_image_singlepage()
     # crawl_artist_image_albumpage()
-    update_wiki_singlepage()
-    # update_wiki_albumpage()
+    # update_wiki_singlepage()
+    update_wiki_albumpage()
 
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))

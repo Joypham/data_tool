@@ -323,9 +323,9 @@ if __name__ == "__main__":
     pd.set_option("display.max_rows", None, "display.max_columns", 80, 'display.width', 1000)
     start_time = time.time()
     # INPUT HERE:
-    # Input_url 'https://docs.google.com/spreadsheets/d/1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg/edit#gid=1528761728&fvid=146755164'
+    # Input_url 'https://docs.google.com/spreadsheets/d/1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg/edit#gid=1704112717&fvid=1943649550'
     gsheet_id = '1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg'  # Single page
-    sheet_name = 'Oct - W2'
+    sheet_name = 'Oct - W3'
     original_live_essential = get_df_from_speadsheet(gsheet_id, sheet_name).fillna(value='None').applymap(
         str.lower).apply(lambda x: x.str.strip())
 

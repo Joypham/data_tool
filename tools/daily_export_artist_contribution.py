@@ -27,5 +27,6 @@ if __name__ == "__main__":
     start_time = time.time()
     # INPUT HERE
     # 'https://docs.google.com/spreadsheets/d/1Ck9O771xM7VArdaYxbHTVtp4kRtHzPn57EDDId0cHJc/edit#gid=0'
+    # 'https://docs.google.com/spreadsheets/d/1wMLmbaY3ZJiPDU2uekzfVVLjwHOzGJ2TpYFNCWTNqAE/edit#gid=0'
     export_artist_contribution()
     print("--- %s seconds ---" % (time.time() - start_time))

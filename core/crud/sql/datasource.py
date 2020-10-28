@@ -37,7 +37,8 @@ def get_datasourceid_from_youtube_url_and_trackid(youtube_url: str, trackid: str
 
 def related_datasourceid(datasourceid: str):
     # Checking if exist in related_table
-    datasourceid = (db_session.query(PlaylistDataSource.playlist_id, UserNarrative.id.label('narrative_id'),
+    datasourceid = (db_session.query(DataSource.id.label('datasourceid'), PlaylistDataSource.playlist_id,
+                                     UserNarrative.id.label('narrative_id'),
                                      CollectionDataSource.collection_uuid)
                     .select_from(DataSource)
                     .outerjoin(PlaylistDataSource,
@@ -47,7 +48,7 @@ def related_datasourceid(datasourceid: str):
                     .outerjoin(CollectionDataSource,
                                CollectionDataSource.datasource_id == DataSource.id)
                     .filter(DataSource.id == datasourceid)
-                    ).all()
+                    )
     return datasourceid
 
 
@@ -57,10 +58,20 @@ def get_all_datasource_valid() -> List[DataSource]:
         DataSource.created_at.desc()).limit(10).all()
 
 
+def get_all_by_ids(datasourceids: list):
+    return db_session.query(DataSource).filter((DataSource.valid == 1),
+                                               DataSource.id.in_(datasourceids)).order_by(
+        DataSource.created_at.desc()).all()
+
+
 if __name__ == "__main__":
-    db_datasources = get_all_datasource_valid()
+    pd.set_option("display.max_rows", None, "display.max_columns", 60, 'display.width', 1000)
+    datasourceids = ["DE365F7B42C646199F372F6A24C42994"]
+    db_datasources = get_all_by_ids(datasourceids)
     for db_datasource in db_datasources:
         print(db_datasource.id)
+        print(db_datasource.ext)
+
 
 #     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 1000)
 #     datasourceids = get_datasourceid_from_youtube_url_and_trackid('https://www.youtube.com/watch?v=xZUu3Q-YToE','BF1F3817A3B6458586991A7C80308299').all()
