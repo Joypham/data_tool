@@ -12,18 +12,25 @@ import time
 
 # gsheet_id = input(f"\n Input gsheet_id: ").strip()
 
-class sheet_name():
-    def __init__(self,sheet_name,column_name, name_range):
-        self.sheet_name
+class spread_sheet:
+    def __init__(self, sheet_name, column_name, name_range):
+        self.sheet_name = sheet_name
+        self.column_name = column_name
+        self.name_range = name_range
 
-    MP3_SHEET_NAME = "MP3"
-    MP3_COLUMN_TITLES = ["track_id", "memo", "mp3_link", "mp3 link to add"]
-    MP4_COLUMN_TITLES = ["track id", "memo", "mp4_link", "mp4 link to add"]
-    MP4_SHEET_NAME = "MP4"
+class sheet_name:
+    MP3_SHEET_NAME = "MP_3"
+    MP4_SHEET_NAME = "MP_4"
     VERSION_SHEET_NAME = "Version Done"
-    MEDIA_WRITE_RESULT_RANGE = "T1:W"
-    VERSION_WRITE_RESULT_RANGE = "T2:W"
 
+
+class column_name:
+    column_length = "len"
+    url_to_add = "url_to_add"
+    track_id = "track_id"
+    memo = "Memo"
+    type = "Type"
+    assignee = "Assignee"
 
 
 def check_youtube_url_mp3():
@@ -404,7 +411,7 @@ def process_MP_4():
     # if checking == 1:
     #     return print("Please recheck check_box")
     # else:
-    sheet_name = 'MP_4'
+    sheet_name = sheet_name.MP4_SHEET_NAME
     original_df = get_df_from_speadsheet(gsheet_id, sheet_name)
     youtube_url_mp4 = original_df[['track_id', 'Memo', 'url_to_add', 'MP4_link']]
     mp4_file_to_process = youtube_url_mp4[
