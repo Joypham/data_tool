@@ -1,4 +1,4 @@
-from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title,update_value
+from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title, update_value
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
 from core.crud.sql.datasource import get_datasourceid_from_youtube_url_and_trackid, related_datasourceid
@@ -11,6 +11,20 @@ import time
 
 
 # gsheet_id = input(f"\n Input gsheet_id: ").strip()
+
+class sheet_name():
+    def __init__(self,sheet_name,column_name, name_range):
+        self.sheet_name
+
+    MP3_SHEET_NAME = "MP3"
+    MP3_COLUMN_TITLES = ["track_id", "memo", "mp3_link", "mp3 link to add"]
+    MP4_COLUMN_TITLES = ["track id", "memo", "mp4_link", "mp4 link to add"]
+    MP4_SHEET_NAME = "MP4"
+    VERSION_SHEET_NAME = "Version Done"
+    MEDIA_WRITE_RESULT_RANGE = "T1:W"
+    VERSION_WRITE_RESULT_RANGE = "T2:W"
+
+
 
 def check_youtube_url_mp3():
     '''
@@ -374,9 +388,9 @@ def check_box():
     print(df)
 
     if 'jane_to_check_result' in list_of_sheet_title:
-        update_value(df.values.tolist(),'jane_to_check_result!A2',gsheet_id)
+        update_value(df.values.tolist(), 'jane_to_check_result!A2', gsheet_id)
     else:
-        creat_new_sheet_and_update_data_from_df(df,gsheet_id,'jane_to_check_result')
+        creat_new_sheet_and_update_data_from_df(df, gsheet_id, 'jane_to_check_result')
 
     return df
 
@@ -393,51 +407,43 @@ def process_MP_4():
     sheet_name = 'MP_4'
     original_df = get_df_from_speadsheet(gsheet_id, sheet_name)
     youtube_url_mp4 = original_df[['track_id', 'Memo', 'url_to_add', 'MP4_link']]
-    mp4_file_to_process = youtube_url_mp4[(youtube_url_mp4['Memo'] == 'not ok') | (youtube_url_mp4['Memo'] == 'added')].reset_index().drop_duplicates(subset=['track_id'],keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+    mp4_file_to_process = youtube_url_mp4[
+        (youtube_url_mp4['Memo'] == 'not ok') | (youtube_url_mp4['Memo'] == 'added')].reset_index().drop_duplicates(
+        subset=['track_id'],
+        keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
 
     row_index = mp4_file_to_process.index
     with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
         for i in row_index:
             memo = mp4_file_to_process.Memo.loc[i]
-            # id = get_uuid4()
             new_youtube_url = mp4_file_to_process.url_to_add.loc[i]
             trackid = mp4_file_to_process.track_id.loc[i]
             old_youtube_url = mp4_file_to_process.MP4_link.loc[i]
-
+            query = ""
             if memo == "not ok" and new_youtube_url == "none":
-                print("trackid:",trackid, '---',"new youtube_url:" ,new_youtube_url, '---',"old_youtube_url:" ,old_youtube_url)
-                datasourceids = get_datasourceid_from_youtube_url_and_trackid(youtube_url= old_youtube_url ,trackid= trackid, formatid= DataSourceFormatMaster.FORMAT_ID_MP4_FULL).all()
-                datasourceids_flatten_list = tuple(set(list(chain.from_iterable(datasourceids))))                       # flatten list
+                datasourceids = get_datasourceid_from_youtube_url_and_trackid(youtube_url=old_youtube_url,
+                                                                              trackid=trackid,
+                                                                              formatid=DataSourceFormatMaster.FORMAT_ID_MP4_FULL).all()
+                datasourceids_flatten_list = tuple(set(list(chain.from_iterable(datasourceids))))  # flatten list
                 if not datasourceids_flatten_list:
-                    print("\n Datasource not existed")
                     continue
                 else:
-                    print("Existed datasources")
                     for datasourceid in datasourceids_flatten_list:
                         related_id_datasource = related_datasourceid(datasourceid)
                         if related_id_datasource == [(None, None, None)]:
-                            # print(f"Not have in related table--- {datasourceid}")
-                            print(f"Update datasources set valid = -10 where id = {datasourceid}")
+                            query = query + f"Update datasources set valid = -10 where id = {datasourceid};"
                         else:
+                            # print(f"Have in related table: set valid = -10 --- {datasourceids_flatten_list}")
+                            query = query + f"UPDATE datasources SET trackid = '', FormatID = ''  where id = '{datasourceid}';\n"
+                            query = query + f"UPDATE datasources SET updatedAt = NOW() WHERE trackid = '{trackid}';\n"
 
+            elif memo == "not ok" and new_youtube_url != "none":
+                query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{trackid}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','replace' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_FULL}','$.PIC', \"Joy_xinh\"),999);\n"
+            elif memo == "added":
+                query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{trackid}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','skip' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_FULL}','$.PIC', \"Joy_xinh\"),999);\n"
+            print(query)
+            f.write(query)
 
-                            print(f"Have in related table: set valid = -10 --- generate new record --- replace")
-                # (PlaylistDataSource.playlist_id, UserNarrative.id.label('narrative_id'),CollectionDataSource.collection_uuid)
-                #     print(datasourceids_flatten_list, related_id_datasource)
-            #
-            #     flatten_list = list(set(list(chain.from_iterable(related_id_datasource))))                              # flatten list
-            #     flatten_list_remove_none = list(filter(lambda x: x is not None, flatten_list))
-            #     # print(len(flatten_list_remove_none))
-            #     with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
-            #         query = ""
-            #         if len(flatten_list_remove_none) == 0:  # Not exist in related table
-            #             query = f"Update datasources set valid = -10 where id in {datasourceids_flatten_list};"
-            #             print(query)
-            #             # f.write(query + "\n")
-            # else:
-            #     continue
-
-            #     query = f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('{id}','{trackid}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{youtube_url}','$.data_source_format_id','7F8B6CD82F28437888BD029EFDA1E57F','$.concert_live_name','{place}','$.year','{year}','$.PIC', \"Joy_xinh\"),999);\n"
             # elif action_type == "COVER_VIDEO":
             #     query = f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('{id}','{trackid}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{youtube_url}','$.data_source_format_id','F5D2FE4A15FB405E988A7309FD3F9920','$.covered_artist_name','{artist_cover}','$.year','{year}','$.PIC', \"Joy_xinh\"),999);\n"
             # elif action_type == "FANCAM_VIDEO":
@@ -460,5 +466,5 @@ if __name__ == "__main__":
 
     # Start tools:
     # check_box()
-    process_MP_4()
+    # process_MP_4()
     print("--- %s seconds ---" % (time.time() - start_time))

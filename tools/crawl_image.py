@@ -35,7 +35,7 @@ def craw_image(gsheet_id, sheet_name):
         #     y = album_filter_df['album_url_to_add'].loc[j]
         #     query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{x}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{y}','$.object_type',\"album\",'$.when_exists',\"replace\",'$.PIC',\"Joy_xinh\"),999);"
         #     print(query)
-        # f.write(query + "\n")
+        f.write(query + "\n")
 
         # if albums_uuid == '':
         #     continue
@@ -49,7 +49,7 @@ def craw_image(gsheet_id, sheet_name):
 if __name__ == "__main__":
     start_time = time.time()
     # INPUT HERE:
-    # Input_url 'https://docs.google.com/spreadsheets/d/1EaKcpZt7dmll2jzYYnZLfy6jwHMaLW1twWY3HyeMUIc/edit#gid=35542443'
-    gsheet_id = '1EaKcpZt7dmll2jzYYnZLfy6jwHMaLW1twWY3HyeMUIc'
-    sheet_name = 'artist image cant upload joy test'
+    # Input_url 'https://docs.google.com/spreadsheets/d/1Ar5HXGbxYXcCNcFcf89sfgsD2XqdW-Va9muUwyzr9u0/edit#gid=940021521'
+    gsheet_id = '1Ar5HXGbxYXcCNcFcf89sfgsD2XqdW-Va9muUwyzr9u0'
+    sheet_name = 'Sheet8'
     craw_image(gsheet_id, sheet_name)

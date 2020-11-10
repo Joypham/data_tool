@@ -1,9 +1,11 @@
 from core.aws.aws_config import AWSConfig
 from core.aws.s3.aws_s3 import existing_on_s3
-from core.crud.sql.datasource import get_all_by_ids, get_all_datasource_valid
+from core.crud.sql.datasource import get_all_by_ids, get_all_datasource_valid, related_datasourceid
 from core.crud.sql.track import get_all_by_track_ids
 from core.models.data_source_format_master import DataSourceFormatMaster
+from core.crud.get_df_from_query import get_df_from_query
 import json
+import pandas as pd
 
 
 def checking_lost_datasource_filename_from_S3(datasource_ids: list):
@@ -130,16 +132,21 @@ def test_jay_lost_background_from_S3():
 
 
 if __name__ == "__main__":
+    pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
+
     datasource_ids = [
-        "7175F299C2164227A25A6FD9BF8C94AD",
-        "1580ED2629A143C6B9446D80DB39D224",
-        "472C25E944B3453AA9B4E1F83744DCEB"
+        "8347F159221A41EEB6157FC7B0902D5C"
+
     ]
     for datasource_id in datasource_ids:
-        datasource_id = [datasource_id]
+
+        datasource_id_list = [datasource_id]
         print("\n ---", datasource_id, "--- \n")
 
-        checking_lost_datasource_filename_from_S3(datasource_id)
-        checking_lost_datasource_image_from_S3(datasource_id)
-        checking_lost_datasource_background_from_S3(datasource_id)
-        checking_lost_pip_from_S3(datasource_id)
+        print(get_df_from_query(related_datasourceid(datasource_id)))
+        checking_lost_datasource_filename_from_S3(datasource_id_list)
+        # checking_lost_datasource_image_from_S3(datasource_id_list)
+        checking_lost_datasource_background_from_S3(datasource_id_list)
+        checking_lost_pip_from_S3(datasource_id_list)
+
+
