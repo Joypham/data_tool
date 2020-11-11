@@ -17,7 +17,8 @@ class sheet_type:
                       "column_name": ["track_id", "Memo", "MP3_link", "url_to_add"]}
     MP4_SHEET_NAME = {"sheet_name": "MP_4", "fomatid": DataSourceFormatMaster.FORMAT_ID_MP4_FULL,
                       "column_name": ["track_id", "Memo", "MP4_link", "url_to_add"]}
-    VERSION_SHEET_NAME = "Version Done"
+    VERSION_SHEET_NAME = {"sheet_name": "Version_done", "fomatid": [DataSourceFormatMaster.FORMAT_ID_MP4_REMIX, DataSourceFormatMaster.FORMAT_ID_MP4_LIVE],
+                      "column_name": ["track_id", "Remix_url", "Remix_artist", "Live_url", "Live_venue", "Live_year"]}
 
 
 def check_youtube_url_mp3():
@@ -443,16 +444,40 @@ def process_mp3_mp4(sheet_info: dict):
                     query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','skip' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{datasource_format_id}','$.PIC', \"Joy_xinh\"),999);\n"
                 f.write(query)
 
-def process_mp3_mp4(sheet_info: dict):
+def process_version_sheet(sheet_info: dict):
+    checking = 'not ok' in check_box().status.drop_duplicates().tolist()
+    if checking == 1:
+        return print("Please recheck check_box")
+    else:
+        original_df = get_df_from_speadsheet(gsheet_id, sheet_info['sheet_name'])
+        youtube_url = original_df[sheet_info['column_name']]
+        file_to_process = youtube_url[
+            (youtube_url['Remix_url'] != '') | (youtube_url['Live_url'] != '')].reset_index().drop_duplicates(
+            subset=['track_id','Remix_url','Live_url'],
+            keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
 
-            # elif action_type == "COVER_VIDEO":
-            #     query = f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('{id}','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{youtube_url}','$.data_source_format_id','F5D2FE4A15FB405E988A7309FD3F9920','$.covered_artist_name','{artist_cover}','$.year','{year}','$.PIC', \"Joy_xinh\"),999);\n"
-            # elif action_type == "FANCAM_VIDEO":
-            #     query = f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('{id}','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{youtube_url}','$.data_source_format_id','DDC08421CAEB4E918F3FE373209020F9','$.concert_live_name','{place}','$.year','{year}','$.PIC', \"Joy_xinh\"),999);\n"
-            # else:
-            #     continue
-            # f.write(query)
-            # print(track_id)
+        row_index = file_to_process.index
+        with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+            for i in row_index:
+                Remix_url = file_to_process.Remix_url.loc[i]
+                Remix_artist = file_to_process.Remix_artist.loc[i]
+                track_id = file_to_process.track_id.loc[i]
+                Live_url = file_to_process.Live_url.loc[i]
+                Live_venue = file_to_process.Live_venue.loc[i]
+                Live_year = file_to_process.Live_year.loc[i]
+                query = ""
+                if Remix_url != '':
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Remix_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_REMIX}','$.remix_artist','{Remix_artist}','$.PIC', \"Joy_xinh\"),999);\n"
+                else:
+                    pass
+                if Live_url != '' and Live_year != '':
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Live_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_LIVE}','$.concert_live_name','{Live_venue}','$.year','{Live_year}','$.PIC', \"Joy_xinh\"),999);\n"
+                elif Live_url != '' and Live_year == '':
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Live_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_LIVE}','$.concert_live_name','{Live_venue}','$.PIC', \"Joy_xinh\"),999);\n"
+                else:
+                    pass
+                print(query)
+                f.write(query)
 
 
 if __name__ == "__main__":
@@ -463,10 +488,10 @@ if __name__ == "__main__":
     # Jane requirement: https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=653576103
     # 'https://docs.google.com/spreadsheets/d/1k1-qrQxZV00ImOsdUv7nsONQBTc_5_45-T580AfTkEc'
     gsheet_id = '1k1-qrQxZV00ImOsdUv7nsONQBTc_5_45-T580AfTkEc'
-    sheet_info = sheet_type.MP3_SHEET_NAME
-    # print(sheet_info['column_name'][2])
+    sheet_info = sheet_type.VERSION_SHEET_NAME
 
     # Start tools:
-    # check_box()
+    check_box()
     # process_mp3_mp4(sheet_info)
+    process_version_sheet(sheet_info)
     print("--- %s seconds ---" % (time.time() - start_time))
