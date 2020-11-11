@@ -12,6 +12,7 @@ def craw_image(gsheet_id, sheet_name):
         & (df.artist_uuid != '')
         & (df.artist_url_to_add.notnull())
         & (df.artist_url_to_add != '')
+        & (df.checking == 'result: False')
         ][['artist_url_to_add', 'artist_uuid']].drop_duplicates(subset='artist_uuid',
                                                                 keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
     artist_row_index = artist_filter_df.index
@@ -49,7 +50,7 @@ def craw_image(gsheet_id, sheet_name):
 if __name__ == "__main__":
     start_time = time.time()
     # INPUT HERE:
-    # Input_url 'https://docs.google.com/spreadsheets/d/1Ar5HXGbxYXcCNcFcf89sfgsD2XqdW-Va9muUwyzr9u0/edit#gid=940021521'
-    gsheet_id = '1Ar5HXGbxYXcCNcFcf89sfgsD2XqdW-Va9muUwyzr9u0'
-    sheet_name = 'Sheet8'
+    # Input_url 'https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=274394075&fvid=750393421'
+    gsheet_id = '1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk'
+    sheet_name = 'wrong resize imgae'
     craw_image(gsheet_id, sheet_name)
