@@ -1,9 +1,9 @@
-from core.crud.sqlalchemy import collect_from_youtube_query
+from core.crud.sql.pointlog import collect_from_youtube_query
 from core.crud.get_df_from_query import get_df_from_query
 from datetime import date
 import time
 import pandas as pd
-from core.crud.sqlalchemy import get_cutoff_date_collect_from_youtube
+
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
 

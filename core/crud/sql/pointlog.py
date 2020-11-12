@@ -3,6 +3,8 @@ from core.models.album_track import Album_Track
 from core.models.track import Track
 from core.models.album import Album
 from core.models.crawlingtask import Crawlingtask
+from core.models.datasource import DataSource
+from core.crud.sqlalchemy import get_compiled_raw_mysql
 
 from sqlalchemy import text
 from sqlalchemy import create_engine
@@ -34,7 +36,12 @@ def collect_from_youtube_query():
                                                    PointLog.crawler_status,
                                                    func.json_extract(PointLog.ext, "$.crawler_id").label("crawler_id"),
                                                    Crawlingtask.status,
-                                                   PointLog.action_type)
+                                                   PointLog.action_type,
+                                                   func.json_extract(DataSource.info, "$.source.title").label(
+                                                       "youtube_title"),
+                                                   func.json_extract(DataSource.info, "$.source.uploader").label(
+                                                       "youtube_uploader")
+                                                   )
                                   .select_from(PointLog)
                                   .outerjoin(Crawlingtask,
                                              text("crawlingtasks.id = pointlogs.ext ->> '$.crawler_id'"))
@@ -42,9 +49,11 @@ def collect_from_youtube_query():
                                              (Track.id == PointLog.target_id) & (Track.id != "") & (Track.valid == 1))
                                   .outerjoin(Album_Track,
                                              (Album_Track.track_id == PointLog.target_id) & (
-                                                         Album_Track.track_id != ""))
+                                                     Album_Track.track_id != ""))
                                   .outerjoin(Album,
                                              (Album.uuid == Album_Track.album_uuid) & (Album.uuid != ""))
+                                  .outerjoin(DataSource,
+                                             text("datasources.id = crawlingtasks.ext ->> '$.data_source_id'"))
                                   .filter(PointLog.action_type == "CY",
                                           PointLog.created_at > '2020-10-01',
                                           PointLog.valid == 0
@@ -65,3 +74,8 @@ def get_cutoff_date_collect_from_youtube():
                 # .first()
                 )
     return get_date
+
+
+if __name__ == "__main__":
+    joy = get_compiled_raw_mysql(collect_from_youtube_query())
+    print(joy)

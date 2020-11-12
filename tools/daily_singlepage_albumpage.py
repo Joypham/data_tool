@@ -1,3 +1,5 @@
+import os
+from core import BASE_DIR
 from core.crud.sql.album import get_album_wiki
 from core.crud.sql.track import get_track_wiki, get_track_lyric
 from core.crud.sql.crawlingtask import get_crawl_artist_image_status, get_artist_image_cant_crawl
@@ -69,7 +71,7 @@ def automate_check_crawl_artist_image_status():  # need to optimize
                          & (df1.status != 'incomplete')
                          ].status.tolist() == []
             if result == 1:
-                print('\n','Checking crawlingtask status \n',df1, '\n')
+                print('\n', 'Checking crawlingtask status \n', df1, '\n')
                 break
             else:
                 count += 1
@@ -93,10 +95,12 @@ def crawl_artist_image_singlepage():
                        & (df.artist_url_to_add != '')
                        ].reset_index().drop_duplicates(subset=['Artist_UUID'],
                                                        keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
-        print("List artist to crawl image \n ", filter_df[['ArtistName', 'Artist_UUID', 's12', 'artist_url_to_add']], "\n")
+        print("List artist to crawl image \n ", filter_df[['ArtistName', 'Artist_UUID', 's12', 'artist_url_to_add']],
+              "\n")
 
     # Step 2: get crawlingtask
     row_index = filter_df.index
+    query_path = os.path.join(BASE_DIR, "sources", "query.txt")
     with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
         for i in row_index:
             x = filter_df['Artist_UUID'].loc[i]
@@ -137,7 +141,8 @@ def crawl_artist_image_albumpage():
                        & (df.artist_url_to_add != '')
                        ].reset_index().drop_duplicates(subset=['Artist_UUID'],
                                                        keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
-        print("List artist to crawl image \n ", filter_df[['ArtistName', 'Artist_UUID', 'A12', 'artist_url_to_add']], "\n")
+        print("List artist to crawl image \n ", filter_df[['ArtistName', 'Artist_UUID', 'A12', 'artist_url_to_add']],
+              "\n")
 
     # Step 2: get crawlingtask
     row_index = filter_df.index
@@ -153,7 +158,9 @@ def crawl_artist_image_albumpage():
 
     # Step 4: upload artist image cant upload
     artist_uuid = filter_df['Artist_UUID'].tolist()
-    df_artist_image_cant_upload = get_df_from_query(get_artist_image_cant_crawl(artist_uuid)).reset_index().drop_duplicates(subset=['Artist_UUID'],keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+    df_artist_image_cant_upload = get_df_from_query(
+        get_artist_image_cant_crawl(artist_uuid)).reset_index().drop_duplicates(subset=['Artist_UUID'],
+                                                                                keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
     joy = df_artist_image_cant_upload[(df_artist_image_cant_upload.status == 'incomplete')].Artist_UUID.tolist() == []
 
     if joy == 1:
@@ -182,10 +189,10 @@ def update_wiki_result_to_gsheet():  # both single page and album page
 
     conditions = [  # create a list of condition => if true =>> update value tương ứng
         ((df_wiki['memo'] == 'not ok') | (df_wiki['memo'] == 'added')) & (df_wiki.content_to_add != 'none') & (
-                    df_wiki.url_to_add != 'none') & (df_wiki.content_to_add != '') & (df_wiki.url_to_add != ''),
+                df_wiki.url_to_add != 'none') & (df_wiki.content_to_add != '') & (df_wiki.url_to_add != ''),
         ((df_wiki['memo'] == 'not ok') | (df_wiki['memo'] == 'added')) & (
-                    (df_wiki.content_to_add == 'none') | (df_wiki.url_to_add == 'none') | (
-                        df_wiki.content_to_add == '') | (df_wiki.url_to_add == '')),
+                (df_wiki.content_to_add == 'none') | (df_wiki.url_to_add == 'none') | (
+                df_wiki.content_to_add == '') | (df_wiki.url_to_add == '')),
         True]
     values = ['wiki added', 'remove wiki', None]  # create a list of the values tương ứng với conditions ơ trên
     df_wiki['joy xinh'] = np.select(conditions,

@@ -38,6 +38,7 @@ def craw_image(gsheet_id, sheet_name):
         #     print(query)
         f.write(query + "\n")
 
+
         # if albums_uuid == '':
         #     continue
         # else:

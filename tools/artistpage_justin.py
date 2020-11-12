@@ -17,8 +17,10 @@ class sheet_type:
                       "column_name": ["track_id", "Memo", "MP3_link", "url_to_add"]}
     MP4_SHEET_NAME = {"sheet_name": "MP_4", "fomatid": DataSourceFormatMaster.FORMAT_ID_MP4_FULL,
                       "column_name": ["track_id", "Memo", "MP4_link", "url_to_add"]}
-    VERSION_SHEET_NAME = {"sheet_name": "Version_done", "fomatid": [DataSourceFormatMaster.FORMAT_ID_MP4_REMIX, DataSourceFormatMaster.FORMAT_ID_MP4_LIVE],
-                      "column_name": ["track_id", "Remix_url", "Remix_artist", "Live_url", "Live_venue", "Live_year"]}
+    VERSION_SHEET_NAME = {"sheet_name": "Version_done", "fomatid": [DataSourceFormatMaster.FORMAT_ID_MP4_REMIX,
+                                                                    DataSourceFormatMaster.FORMAT_ID_MP4_LIVE],
+                          "column_name": ["track_id", "Remix_url", "Remix_artist", "Live_url", "Live_venue",
+                                          "Live_year"]}
 
 
 def check_youtube_url_mp3():
@@ -125,7 +127,8 @@ def check_version():
     original_df['Live_year'] = pd.to_numeric(original_df.Live_year, errors='coerce').astype('Int64').fillna(0)
 
     youtube_url_version = original_df[
-        ['track_id', 'Remix_url', 'Remix_artist', 'Live_url', 'Live_venue', 'len_remix_url', 'len_live_url', 'Live_year']]
+        ['track_id', 'Remix_url', 'Remix_artist', 'Live_url', 'Live_venue', 'len_remix_url', 'len_live_url',
+         'Live_year']]
 
     check_version = youtube_url_version[~
     (((
@@ -142,7 +145,8 @@ def check_version():
               (youtube_url_version['track_id'] != '')
               & (youtube_url_version['len_live_url'] == 43)
               & (youtube_url_version['Live_venue'] != '')
-              & ((youtube_url_version['Live_year'] == 0) | ((1950 <= original_df['Live_year']) & (original_df['Live_year'] <= 2030)))
+              & ((youtube_url_version['Live_year'] == 0) | (
+                  (1950 <= original_df['Live_year']) & (original_df['Live_year'] <= 2030)))
       ) |
       (
               (youtube_url_version['track_id'] != '')
@@ -444,6 +448,7 @@ def process_mp3_mp4(sheet_info: dict):
                     query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','skip' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{datasource_format_id}','$.PIC', \"Joy_xinh\"),999);\n"
                 f.write(query)
 
+
 def process_version_sheet(sheet_info: dict):
     checking = 'not ok' in check_box().status.drop_duplicates().tolist()
     if checking == 1:
@@ -453,7 +458,7 @@ def process_version_sheet(sheet_info: dict):
         youtube_url = original_df[sheet_info['column_name']]
         file_to_process = youtube_url[
             (youtube_url['Remix_url'] != '') | (youtube_url['Live_url'] != '')].reset_index().drop_duplicates(
-            subset=['track_id','Remix_url','Live_url'],
+            subset=['track_id', 'Remix_url', 'Live_url'],
             keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
 
         row_index = file_to_process.index
@@ -487,11 +492,11 @@ if __name__ == "__main__":
     # Justin requirement: https://docs.google.com/spreadsheets/d/1LClklcO0OEMmQ1iaCZ34n1hhjlP1lIBj7JMjm2qrYVw/edit#gid=0
     # Jane requirement: https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=653576103
     # 'https://docs.google.com/spreadsheets/d/1k1-qrQxZV00ImOsdUv7nsONQBTc_5_45-T580AfTkEc'
-    gsheet_id = '1k1-qrQxZV00ImOsdUv7nsONQBTc_5_45-T580AfTkEc'
-    sheet_info = sheet_type.VERSION_SHEET_NAME
+    gsheet_id = '1O6A8ExEyu220CmTY-5T-fkzEAfsMyTgfqjtSd4IZfHo'
+    # sheet_info = sheet_type.MP4_SHEET_NAME
 
     # Start tools:
     check_box()
     # process_mp3_mp4(sheet_info)
-    process_version_sheet(sheet_info)
+    # process_version_sheet(sheet_info)
     print("--- %s seconds ---" % (time.time() - start_time))
