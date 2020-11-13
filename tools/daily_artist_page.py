@@ -1,6 +1,7 @@
 from google_spreadsheet_api.function import get_df_from_speadsheet
 import pandas as pd
 import time
+from core import query_path
 
 
 def crawl_artist_album_from_artist_ituneid():
@@ -16,7 +17,7 @@ def crawl_artist_album_from_artist_ituneid():
                     & (df.external_id != '')
                     & (df.external_id != 'None')
                    ].index
-    with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+    with open(query_path, "w") as f:
         for i in row_index:
             external_id = df.external_id.loc[i]
             joy_xinh = f"insert into crawlingtasks(Id, ActionId, TaskDetail, Priority) values (uuid4(), '3FFA9CB0E221416288ACFE96B5810BD2',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.artist_id','{external_id}'),999) ;\n"

@@ -2,6 +2,7 @@ from google_spreadsheet_api.function import get_df_from_speadsheet
 import time
 import pandas as pd
 import numpy as np
+from core import query_path
 
 
 def craw_image(gsheet_id, sheet_name):
@@ -25,7 +26,7 @@ def craw_image(gsheet_id, sheet_name):
     # ][['album_url_to_add','albums_uuid']].drop_duplicates(subset='albums_uuid', keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
     # album_row_index = album_filter_df.index
 
-    with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+    with open(query_path, "w") as f:
         for i in artist_row_index:
             x = artist_filter_df['artist_uuid'].loc[i]
             y = artist_filter_df['artist_url_to_add'].loc[i]

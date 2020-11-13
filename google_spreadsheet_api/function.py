@@ -4,6 +4,7 @@ from google.auth.transport.requests import Request
 import os.path
 import pickle
 import pandas as pd
+from core import credentials_path, token_path
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
@@ -16,8 +17,8 @@ def service():
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists('/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/token.pickle'):
-        with open('/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/token.pickle', 'rb') as token:
+    if os.path.exists(token_path):
+        with open(token_path, 'rb') as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -25,10 +26,10 @@ def service():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                '/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/credentials.json', SCOPES)
+                credentials_path, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/token.pickle', 'wb') as token:
+        with open(token_path, 'wb') as token:
             pickle.dump(creds, token)
 
     service = build('sheets', 'v4', credentials=creds)

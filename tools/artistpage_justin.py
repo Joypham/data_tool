@@ -8,6 +8,7 @@ from tools import get_uuid4
 from itertools import chain
 import pandas as pd
 import time
+from core import query_path
 
 
 # gsheet_id = input(f"\n Input gsheet_id: ").strip()
@@ -419,7 +420,7 @@ def process_mp3_mp4(sheet_info: dict):
         row_index = file_to_process.index
         old_youtube_url_column_name = sheet_info['column_name'][2]
         datasource_format_id = sheet_info['fomatid']
-        with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+        with open(query_path, "w") as f:
             for i in row_index:
                 memo = file_to_process.Memo.loc[i]
                 new_youtube_url = file_to_process.url_to_add.loc[i]
@@ -462,7 +463,7 @@ def process_version_sheet(sheet_info: dict):
             keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
 
         row_index = file_to_process.index
-        with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+        with open(query_path, "w") as f:
             for i in row_index:
                 Remix_url = file_to_process.Remix_url.loc[i]
                 Remix_artist = file_to_process.Remix_artist.loc[i]
@@ -492,11 +493,13 @@ if __name__ == "__main__":
     # Justin requirement: https://docs.google.com/spreadsheets/d/1LClklcO0OEMmQ1iaCZ34n1hhjlP1lIBj7JMjm2qrYVw/edit#gid=0
     # Jane requirement: https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=653576103
     # 'https://docs.google.com/spreadsheets/d/1k1-qrQxZV00ImOsdUv7nsONQBTc_5_45-T580AfTkEc'
+
+    # test: https://docs.google.com/spreadsheets/d/1O6A8ExEyu220CmTY-5T-fkzEAfsMyTgfqjtSd4IZfHo/edit#gid=0
     gsheet_id = '1O6A8ExEyu220CmTY-5T-fkzEAfsMyTgfqjtSd4IZfHo'
-    # sheet_info = sheet_type.MP4_SHEET_NAME
+    sheet_info = sheet_type.MP4_SHEET_NAME
 
     # Start tools:
-    check_box()
-    # process_mp3_mp4(sheet_info)
+    # check_box()
+    process_mp3_mp4(sheet_info)
     # process_version_sheet(sheet_info)
     print("--- %s seconds ---" % (time.time() - start_time))

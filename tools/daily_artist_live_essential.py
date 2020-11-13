@@ -13,7 +13,7 @@ from support_function.text_similarity.text_similarity import get_token_set_ratio
 from tools.get_uuid4 import get_uuid4
 import time
 import pandas as pd
-
+from core import query_path
 import numpy as np
 
 
@@ -64,7 +64,7 @@ def crawl_itune_album():
                                                                         keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
 
     row_index = filter_df.index
-    with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+    with open(query_path, "w") as f:
         for i in row_index:
             ituneid = filter_df.ituneid.loc[i]
             region = filter_df['region'].loc[i]
@@ -137,7 +137,7 @@ def crawl_live_essential_youtube():
                                    & (raw_live_essential.track_id.notnull())
                                    ]
     row_index = filter_df.index
-    with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+    with open(query_path, "w") as f:
         for i in row_index:
             id = get_uuid4()
             youtube_url = filter_df.youtube_url.loc[i]
@@ -291,7 +291,7 @@ def update_date_live_essential():
         subset='playlist_id', keep="first")
     essential_playlist_row_index = essential_playlist.index
     query = ""
-    with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+    with open(query_path, "w") as f:
         for i in essential_playlist_row_index:
             playlist_id = essential_playlist.playlist_id.loc[i]
             user_uuid = essential_playlist.user_uuid.loc[i]

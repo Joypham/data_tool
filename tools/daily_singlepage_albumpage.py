@@ -11,6 +11,7 @@ from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import crea
 import time
 import pandas as pd
 import numpy as np
+from core import query_path
 
 
 # gsheet_id = input(f"\n Input gsheet_id: ").strip()
@@ -100,8 +101,7 @@ def crawl_artist_image_singlepage():
 
     # Step 2: get crawlingtask
     row_index = filter_df.index
-    query_path = os.path.join(BASE_DIR, "sources", "query.txt")
-    with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+    with open(query_path, "w") as f:
         for i in row_index:
             x = filter_df['Artist_UUID'].loc[i]
             y = filter_df['artist_url_to_add'].loc[i]
@@ -146,7 +146,7 @@ def crawl_artist_image_albumpage():
 
     # Step 2: get crawlingtask
     row_index = filter_df.index
-    with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+    with open(query_path, "w") as f:
         for i in row_index:
             x = filter_df['Artist_UUID'].loc[i]
             y = filter_df['artist_url_to_add'].loc[i]
@@ -220,7 +220,7 @@ def update_wiki_singlepage():
         # print(df_wiki_filter)
         row_index = df_wiki_filter.index
         # print(row_index)
-        with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+        with open(query_path, "w") as f:
             for i in row_index:
                 id = df_wiki_filter.id.loc[i]
                 url = df_wiki_filter.url_to_add.loc[i]
@@ -252,7 +252,7 @@ def update_wiki_albumpage():
         # print(df_wiki_filter)
         row_index = df_wiki_filter.index
         # print(row_index)
-        with open("/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt", "w") as f:
+        with open(query_path, "w") as f:
             for i in row_index:
                 uuid = df_wiki_filter.uuid.loc[i]
                 url = df_wiki_filter.url_to_add.loc[i]

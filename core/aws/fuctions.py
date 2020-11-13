@@ -6,6 +6,7 @@ from core.models.data_source_format_master import DataSourceFormatMaster
 from core.crud.get_df_from_query import get_df_from_query
 import json
 import pandas as pd
+from core import query_path
 
 
 def checking_lost_datasource_filename_from_S3(datasource_ids: list):
@@ -97,7 +98,7 @@ def test_jay_lost_background_from_S3():
     with open('/Users/phamhanh/Desktop/bg_datasource_ids.json') as json_file:
         data = json.load(json_file)
 
-    with open('/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/query.txt', "w") as f:
+    with open(query_path, "w") as f:
         datasource_ids = get_all_datasource_valid(thread_session)
         for db_datasource in datasource_ids:
             if 'bg_720_file_name' in db_datasource.ext.keys():
