@@ -495,11 +495,41 @@ if __name__ == "__main__":
     # 'https://docs.google.com/spreadsheets/d/1k1-qrQxZV00ImOsdUv7nsONQBTc_5_45-T580AfTkEc'
 
     # test: https://docs.google.com/spreadsheets/d/1O6A8ExEyu220CmTY-5T-fkzEAfsMyTgfqjtSd4IZfHo/edit#gid=0
-    gsheet_id = '1O6A8ExEyu220CmTY-5T-fkzEAfsMyTgfqjtSd4IZfHo'
-    sheet_info = sheet_type.MP4_SHEET_NAME
+    gsheet_id = '1k1-qrQxZV00ImOsdUv7nsONQBTc_5_45-T580AfTkEc'
+    # sheet_info = sheet_type.MP4_SHEET_NAME
+    k = check_box()
+    # joy = k[
+    #     (k['status'] == "not ok")
+    #     & (k['comment'].str.contains('not found'))
+    #                 ]
+    # print(joy)
+
+
+    # album_image[~
+    # ((
+    #          (album_image['Album_uuid'] != '')
+    #          & (album_image['Memo'] == 'ok')
+    #          & (album_image['url_to_add'] == '')
+    #  ) |
+    #  (
+    #          (album_image['Album_uuid'] != '')
+    #          & (album_image['Memo'] == 'added')
+    #          & (album_image['url_to_add'] != '')
+    #  ) |
+    #  (
+    #          (album_image['Album_uuid'] != '')
+    #          & (album_image['Memo'] == 'not found')
+    #          & (album_image['url_to_add'] == 'none')
+    #  ) |
+    #  (
+    #      (album_image['Assignee'] == 'no need to check')
+    #  ))
+    # ]
+
+
 
     # Start tools:
     # check_box()
-    process_mp3_mp4(sheet_info)
+    # process_mp3_mp4(sheet_info)
     # process_version_sheet(sheet_info)
     print("--- %s seconds ---" % (time.time() - start_time))
