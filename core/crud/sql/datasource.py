@@ -8,6 +8,7 @@ from core.models.datasource import DataSource
 from core.models.playlist_datasource import PlaylistDataSource
 from core.models.usernarrative import UserNarrative
 from core.models.collection_datasource import CollectionDataSource
+from core.models.data_source_format_master import DataSourceFormatMaster
 
 from typing import Optional, Tuple, Dict, List
 from itertools import chain
@@ -64,26 +65,24 @@ def get_all_by_ids(datasourceids: list):
         DataSource.created_at.desc()).all()
 
 
+def get_youtube_info_from_trackid(track_ids: list, format_id):
+    datasourceid = (db_session.query(DataSource.track_id.label('track_id'),
+                                     DataSource.id.label('datasource_id'),
+                                     DataSource.source_uri.label('youtube_url'),
+                                     func.json_extract(DataSource.info, "$.source.title").label(
+                                         "youtube_title"),
+                                     func.json_extract(DataSource.info, "$.source.uploader").label(
+                                         "youtube_uploader"))
+                    .select_from(DataSource)
+                    .filter(DataSource.track_id.in_(track_ids),
+                            DataSource.valid == 1,
+                            DataSource.format_id == format_id)
+                    ).order_by(DataSource.created_at.desc())
+    return datasourceid
+
+
 if __name__ == "__main__":
-    # pd.set_option("display.max_rows", None, "display.max_columns", 60, 'display.width', 1000)
-    # datasourceids = ["BD399512B1B04EE28DBDB93D892081EB"]
-    # db_datasources = get_all_by_ids(datasourceids)
-    # for db_datasource in db_datasources:
-    #     print(db_datasource.id)
-    #     print(db_datasource.ext)
-
-
-    pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 1000)
-    datasourceids = get_datasourceid_from_youtube_url_and_trackid('https://www.youtube.com/watch?v=xZUu3Q-YToE','BF1F3817A3B6458586991A7C80308299').all()
-    datasourceids_flatten_list = tuple(set(list(chain.from_iterable(datasourceids))))  # flatten list
-    print(datasourceids)
-#
-# related_id_datasource = related_datasourceid(datasourceids).all()
-# flatten_list = list(set(list(chain.from_iterable(related_id_datasource))))   # flatten list
-# flatten_list_remove_none = list(filter(lambda x: x is not None, flatten_list))
-# if len(flatten_list_remove_none) == 0: #     Not exist in related table
-#
-#     print(len(flatten_list_remove_none))
-
-
-# k = get_df_from_query(joy_xinh).values.flatten().tolist()
+    track_ids = ["C865654002BC42DDBF0B44F4D8A1C16D"]
+    format_id = DataSourceFormatMaster.FORMAT_ID_MP3_FULL
+    joy = get_compiled_raw_mysql(get_youtube_info_from_trackid(track_ids, format_id))
+    print(joy)

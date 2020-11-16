@@ -1,21 +1,25 @@
 from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title, update_value
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
-from core.crud.sql.datasource import get_datasourceid_from_youtube_url_and_trackid, related_datasourceid
+from core.crud.sql.datasource import get_datasourceid_from_youtube_url_and_trackid, related_datasourceid, \
+    get_youtube_info_from_trackid
 from core.models.data_source_format_master import DataSourceFormatMaster
+from core.crud.get_df_from_query import get_df_from_query
 
 from tools import get_uuid4
 from itertools import chain
 import pandas as pd
 import time
 from core import query_path
+from support_function.text_similarity.text_similarity import get_token_set_ratio
+import numpy as np
 
 
 # gsheet_id = input(f"\n Input gsheet_id: ").strip()
 
 class sheet_type:
     MP3_SHEET_NAME = {"sheet_name": "MP_3", "fomatid": DataSourceFormatMaster.FORMAT_ID_MP3_FULL,
-                      "column_name": ["track_id", "Memo", "MP3_link", "url_to_add"]}
+                      "column_name": ["track_id", "Memo", "Mp3_link", "url_to_add"]}
     MP4_SHEET_NAME = {"sheet_name": "MP_4", "fomatid": DataSourceFormatMaster.FORMAT_ID_MP4_FULL,
                       "column_name": ["track_id", "Memo", "MP4_link", "url_to_add"]}
     VERSION_SHEET_NAME = {"sheet_name": "Version_done", "fomatid": [DataSourceFormatMaster.FORMAT_ID_MP4_REMIX,
@@ -147,7 +151,7 @@ def check_version():
               & (youtube_url_version['len_live_url'] == 43)
               & (youtube_url_version['Live_venue'] != '')
               & ((youtube_url_version['Live_year'] == 0) | (
-                  (1950 <= original_df['Live_year']) & (original_df['Live_year'] <= 2030)))
+              (1950 <= original_df['Live_year']) & (original_df['Live_year'] <= 2030)))
       ) |
       (
               (youtube_url_version['track_id'] != '')
@@ -406,10 +410,11 @@ def process_mp3_mp4(sheet_info: dict):
     Memo = not ok and url_to_add not null => crawl mode replace
     Memo = added => crawl mode skip
     '''
+    k = check_box()
     check_box_filtered = k[~(
-        (k['status'] == "not ok")
-        & (k['comment'].str.contains('not found')))
-                    ]
+            (k['status'] == "not ok")
+            & (k['comment'].str.contains('not found')))
+    ]
     checking = 'not ok' in check_box_filtered.status.drop_duplicates().tolist()
     if checking == 1:
         return print("Please recheck check_box")
@@ -455,6 +460,7 @@ def process_mp3_mp4(sheet_info: dict):
 
 
 def process_version_sheet(sheet_info: dict):
+    k = check_box()
     check_box_filtered = k[~(
             (k['status'] == "not ok")
             & (k['comment'].str.contains('not found')))
@@ -494,6 +500,32 @@ def process_version_sheet(sheet_info: dict):
                 f.write(query)
 
 
+def final_check():
+    sheet_name = sheet_info['sheet_name']
+    datasource_format_id = sheet_info['fomatid']
+    original_sheet = get_df_from_speadsheet(gsheet_id, sheet_name)
+
+    list_trackid = original_sheet['track_id'].drop_duplicates().values.tolist()
+    query_df = get_df_from_query(get_youtube_info_from_trackid(list_trackid, datasource_format_id))
+
+    merge_df = pd.merge(original_sheet, query_df, how='left',
+                        on='track_id').fillna(value='None')
+
+    merge_df['token_set_ratio_title'] = merge_df.apply(
+        lambda x: get_token_set_ratio(x['Song Title on Itunes'], x.youtube_title), axis=1)
+
+
+    merge_df['token_set_ratio_artist'] = merge_df.apply(
+        lambda x: get_token_set_ratio(x['Artist Track on iTunes'], x.youtube_uploader), axis=1)
+
+
+    column_name = query_df.columns.tolist() + ['token_set_ratio_title', 'token_set_ratio_artist']
+    list_result = merge_df[column_name].values.tolist()  # transfer data_frame to 2D list
+    list_result.insert(0, column_name)
+    range_to_update = f"{sheet_name}!K1"
+    update_value(list_result, range_to_update, gsheet_id)  # validate_value type: object, int, category... NOT DATETIME
+    print("update data in gsheet completed")
+
 if __name__ == "__main__":
     start_time = time.time()
     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
@@ -504,15 +536,11 @@ if __name__ == "__main__":
 
     # test: https://docs.google.com/spreadsheets/d/1O6A8ExEyu220CmTY-5T-fkzEAfsMyTgfqjtSd4IZfHo/edit#gid=0
     gsheet_id = '1O6A8ExEyu220CmTY-5T-fkzEAfsMyTgfqjtSd4IZfHo'
-    sheet_info = sheet_type.MP4_SHEET_NAME
-    # check_box_filtered = k[~(
-    #     (k['status'] == "not ok")
-    #     & (k['comment'].str.contains('not found')))
-    #                 ]
-
+    sheet_info = sheet_type.MP3_SHEET_NAME
+    final_check()
 
     # Start tools:
     # check_box()
-    process_mp3_mp4(sheet_info)
+    # process_mp3_mp4(sheet_info)
     # process_version_sheet(sheet_info)
     print("--- %s seconds ---" % (time.time() - start_time))

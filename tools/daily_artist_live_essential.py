@@ -331,10 +331,10 @@ if __name__ == "__main__":
 
     # PROCESS HERE:
     # check_box()
-    crawl_itune_album()
+    # crawl_itune_album()
     # check_crawl_E5_06_status()
     # check_get_trackid_from_ituneid_and_tracknum()
-    # crawl_live_essential_youtube()
+    crawl_live_essential_youtube()
 
     # get_datasourceid()
     # finalize_data()
