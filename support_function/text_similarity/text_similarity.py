@@ -28,9 +28,10 @@ def get_token_set_ratio(str1: str, str2: str):
 
 
 if __name__ == "__main__":
-    str1 = 'b w u'
-    str2 = 'BWU'
+    str1 = 'Albur De Amor'
+    str2 = "Albur De Amor - Pepe Aguilar - Del Álbum Lo Grande De Los Grandes"
     # joy = get_token_set_ratio(str2, str1)
     print(string_reformat(str1))
     print(string_reformat(str2))
     print(get_token_set_ratio(str2, str1))
+    print(get_token_set_ratio(str1, str2))

@@ -337,6 +337,6 @@ if __name__ == "__main__":
     crawl_live_essential_youtube()
 
     # get_datasourceid()
-    # finalize_data()
+    finalize_data()
     # update_date_live_essential()
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))

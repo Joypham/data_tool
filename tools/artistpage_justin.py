@@ -1,4 +1,4 @@
-from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title, update_value
+from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title, update_value, creat_new_sheet_and_update_data_from_df
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
 from core.crud.sql.datasource import get_datasourceid_from_youtube_url_and_trackid, related_datasourceid, \
@@ -6,12 +6,15 @@ from core.crud.sql.datasource import get_datasourceid_from_youtube_url_and_track
 from core.models.data_source_format_master import DataSourceFormatMaster
 from core.crud.get_df_from_query import get_df_from_query
 
+from youtube_dl_fuction.fuctions import get_title_uploader_from_youtube_url
+
 from tools import get_uuid4
 from itertools import chain
 import pandas as pd
 import time
 from core import query_path
 from support_function.text_similarity.text_similarity import get_token_set_ratio
+from numpy import random
 import numpy as np
 
 
@@ -511,24 +514,76 @@ def final_check():
     merge_df = pd.merge(original_sheet, query_df, how='left',
                         on='track_id').fillna(value='None')
 
-    merge_df['token_set_ratio_title'] = merge_df.apply(
-        lambda x: get_token_set_ratio(x['Song Title on Itunes'], x.youtube_title), axis=1)
+    row_index = merge_df.index
+    get_youtube_titles = []
+    get_youtube_uploaders = []
+    token_set_ratio_titles = []
+    token_set_ratio_artists = []
 
+    for i in row_index:
+        youtube_title = merge_df.youtube_title.loc[i]
+        youtube_uploader = merge_df.youtube_uploader.loc[i]
+        youtube_url = merge_df.youtube_url.loc[i]
 
-    merge_df['token_set_ratio_artist'] = merge_df.apply(
-        lambda x: get_token_set_ratio(x['Artist Track on iTunes'], x.youtube_uploader), axis=1)
+        itune_title = merge_df['Song Title on Itunes'].loc[i]
+        itune_artist = merge_df['Artist Track on iTunes'].loc[i]
 
+        if "https://www.youtube.com/watch?v=" in youtube_url and (youtube_title == 'None' or youtube_title == "\"_\""):
+            get_youtube_info = get_title_uploader_from_youtube_url(youtube_url)
+            get_youtube_title = get_youtube_info['youtube_title']
+            get_youtube_uploader = get_youtube_info['uploader']
 
-    column_name = query_df.columns.tolist() + ['token_set_ratio_title', 'token_set_ratio_artist']
-    list_result = merge_df[column_name].values.tolist()  # transfer data_frame to 2D list
+            get_youtube_titles.append(get_youtube_title)
+            get_youtube_uploaders.append(get_youtube_uploader)
+
+            token_set_ratio_title = get_token_set_ratio(itune_title,get_youtube_title)
+            token_set_ratio_artist = get_token_set_ratio(itune_artist, get_youtube_uploader)
+
+            token_set_ratio_titles.append(token_set_ratio_title)
+            token_set_ratio_artists.append(token_set_ratio_artist)
+
+            x = random.uniform(0.5, 5)
+            time.sleep(x)
+
+        elif "https://www.youtube.com/watch?v=" in youtube_url:
+            get_youtube_titles.append(youtube_title)
+            get_youtube_uploaders.append(youtube_uploader)
+
+            token_set_ratio_title = get_token_set_ratio(itune_title, youtube_title)
+            token_set_ratio_artist = get_token_set_ratio(itune_artist, youtube_uploader)
+
+            token_set_ratio_titles.append(token_set_ratio_title)
+            token_set_ratio_artists.append(token_set_ratio_artist)
+        else:
+            get_youtube_titles.append("None")
+            get_youtube_uploaders.append("None")
+            token_set_ratio_titles.append("None")
+            token_set_ratio_artists.append("None")
+
+    se_youtube_title = pd.Series(get_youtube_titles)
+    se_youtube_uploader = pd.Series(get_youtube_uploaders)
+
+    se_token_set_ratio_title = pd.Series(token_set_ratio_titles)
+    se_token_set_ratio_artist = pd.Series(token_set_ratio_artists)
+
+    merge_df['get_youtube_title'] = se_youtube_title.values
+    merge_df['get_youtube_uploader'] = se_youtube_uploader.values
+    merge_df['token_set_ratio_title'] = se_token_set_ratio_title.values
+    merge_df['token_set_ratio_artist'] = se_token_set_ratio_artist.values
+
+    print(merge_df)
+
+    updated_df = merge_df[['datasource_id', 'youtube_url', 'youtube_title', 'youtube_uploader', 'get_youtube_title', 'get_youtube_uploader', 'token_set_ratio_title', 'token_set_ratio_artist']]
+    column_name = updated_df.columns.values.tolist()
+    list_result = updated_df.values.tolist()  # transfer data_frame to 2D list
     list_result.insert(0, column_name)
     range_to_update = f"{sheet_name}!K1"
     update_value(list_result, range_to_update, gsheet_id)  # validate_value type: object, int, category... NOT DATETIME
-    print("update data in gsheet completed")
+
 
 if __name__ == "__main__":
     start_time = time.time()
-    pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
+    pd.set_option("display.max_rows", None, "display.max_columns", 50, 'display.width', 1000)
     # INPUT HERE
     # Justin requirement: https://docs.google.com/spreadsheets/d/1LClklcO0OEMmQ1iaCZ34n1hhjlP1lIBj7JMjm2qrYVw/edit#gid=0
     # Jane requirement: https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=653576103

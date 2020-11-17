@@ -77,7 +77,7 @@ def get_youtube_info_from_trackid(track_ids: list, format_id):
                     .filter(DataSource.track_id.in_(track_ids),
                             DataSource.valid == 1,
                             DataSource.format_id == format_id)
-                    ).order_by(DataSource.created_at.desc())
+                    ).group_by(DataSource.track_id).order_by(DataSource.created_at.desc())
     return datasourceid
 
 

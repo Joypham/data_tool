@@ -4,6 +4,7 @@ from datetime import date
 from youtube_dl_fuction.fuctions import get_title_uploader_from_youtube_url
 import time
 import pandas as pd
+from numpy import random
 
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
@@ -24,6 +25,7 @@ def daily_user_collect_from_youtube():
     df = get_df_from_query(collect_from_youtube_query())
     df = df.fillna(value='None').astype({"created_at": 'str'})
     df['contribution_url'] = df['contribution_url'].apply(lambda x: x.replace('"', ""))
+    # df = df.head(100)
 
     row_index = df.index
     get_youtube_titles = []
@@ -41,6 +43,9 @@ def daily_user_collect_from_youtube():
             get_youtube_titles.append(get_youtube_title)
             get_youtube_uploaders.append(get_youtube_uploader)
 
+            x = random.uniform(0.5, 5)
+            time.sleep(x)
+
         else:
             get_youtube_titles.append(youtube_title)
             get_youtube_uploaders.append(youtube_uploader)
@@ -50,8 +55,6 @@ def daily_user_collect_from_youtube():
     df['get_youtube_title'] = se_youtube_title.values
     df['get_youtube_uploader'] = se_youtube_uploader.values
     print(df)
-
-
 
     # print("\n", "Get data result \n", df)
     # STEP 2: Create sheet and update data to sheet

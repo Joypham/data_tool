@@ -14,19 +14,23 @@ def get_title_uploader_from_youtube_url(youtube_url: str):
         )
         joy = {"youtube_url": youtube_url, "uploader": result.get('uploader'), "youtube_title": result.get('title')}
     except DownloadError as ex:
-        joy = {"youtube_url": youtube_url, "uploader": {ex}, "youtube_title": {ex}}
+        joy = {"youtube_url": youtube_url, "uploader": f"{ex}", "youtube_title": f"{ex}"}
+    except:  # noqa
+        joy = {"youtube_url": youtube_url, "uploader": "Error: Unknown error", "youtube_title": "Error: Unknown error"}
     return joy
 
 
 if __name__ == "__main__":
     start_time = time.time()
 
-    youtube_url = "https://www.youtube.com/watch?v=gP0HmLV-X0c"
+    youtube_url = "https://www.youtube.com/watch?v=iHkrXYBkDiA"
 
     get_youtube_info = get_title_uploader_from_youtube_url(youtube_url)
 
     get_youtube_title = get_youtube_info['youtube_title']
     get_youtube_uploader = get_youtube_info['uploader']
+
+    print("start")
     print(get_youtube_title)
     print(get_youtube_uploader)
 
