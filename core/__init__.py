@@ -11,8 +11,5 @@ config_path = os.path.join(CORE_DIR, "database_connection", "config.json")
 
 
 
-# if __name__ == "__main__":
-#     print(CORE_DIR)
-#     print(BASE_DIR)
-#     print(config_path)
+
 
