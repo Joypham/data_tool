@@ -512,6 +512,7 @@ def final_check():
 
     merge_df = pd.merge(original_sheet, query_df, how='left',
                         on='track_id').fillna(value='None')
+    # merge_df = merge_df.head(100)
 
     row_index = merge_df.index
     get_youtube_titles = []
@@ -586,10 +587,10 @@ if __name__ == "__main__":
     # INPUT HERE
     # Justin requirement: https://docs.google.com/spreadsheets/d/1LClklcO0OEMmQ1iaCZ34n1hhjlP1lIBj7JMjm2qrYVw/edit#gid=0
     # Jane requirement: https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=653576103
-    # 'https://docs.google.com/spreadsheets/d/1k1-qrQxZV00ImOsdUv7nsONQBTc_5_45-T580AfTkEc'
+    # 'https://docs.google.com/spreadsheets/d/1MuEB6erMb8mD--HQLh85NDIcxL-coeoQ_wfB8ilyfak/edit#gid=1713188461'
 
-    # test: https://docs.google.com/spreadsheets/d/1O6A8ExEyu220CmTY-5T-fkzEAfsMyTgfqjtSd4IZfHo/edit#gid=0
-    gsheet_id = '1O6A8ExEyu220CmTY-5T-fkzEAfsMyTgfqjtSd4IZfHo'
+    # test: https://docs.google.com/spreadsheets/d/18_xS2CK2sYMbIfDLEPtH2gS4s_CR9gwVeby18rnYrsQ/edit#gid=1072344548
+    gsheet_id = '18_xS2CK2sYMbIfDLEPtH2gS4s_CR9gwVeby18rnYrsQ'
     sheet_info = sheet_type.MP4_SHEET_NAME
     final_check()
 

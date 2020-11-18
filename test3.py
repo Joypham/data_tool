@@ -23,7 +23,7 @@ def get_title_uploader_from_youtube_url(youtube_url: str):
 if __name__ == "__main__":
     start_time = time.time()
 
-    youtube_url = "https://www.youtube.com/watch?v=iHkrXYBkDiA"
+    youtube_url = "https://www.youtube.com/watch?v=9lHxvmkUoho"
 
     get_youtube_info = get_title_uploader_from_youtube_url(youtube_url)
 

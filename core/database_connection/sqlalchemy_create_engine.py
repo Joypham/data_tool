@@ -1,7 +1,9 @@
 from sqlalchemy import create_engine
 import json
+from core import config_path
 
-config_file = '/Users/phamhanh/PycharmProjects/data_operation_fixed1/core/database_connection/config.json'
+
+config_file = config_path
 with open(config_file) as json_data_file:
     config = json.load(json_data_file)
 
