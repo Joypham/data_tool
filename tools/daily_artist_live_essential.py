@@ -1,4 +1,3 @@
-from google_spreadsheet_api.function import add_sheet
 from google_spreadsheet_api.function import update_value
 from google_spreadsheet_api.function import get_df_from_speadsheet
 from core.crud.get_df_from_query import get_df_from_query
@@ -15,6 +14,15 @@ import time
 import pandas as pd
 from core import query_path
 import numpy as np
+
+def intern_process():
+    intern_checking_file = get_df_from_speadsheet(gsheet_id=gsheet_id, sheet_name= "iTunes checking!B3:U3939").applymap(
+        str.lower).apply(lambda x: x.str.strip())
+    k1 = intern_checking_file
+    k = intern_checking_file['artist_of_the_collection','single_title', 'youtube_url', 'filename','Recheck ID', 'Track_title', 'Itunes_ID', 'album region', 'Itunes_Album_Link', 'Version', 'artist_name']
+    print(k.head(10))
+    # k = pd.merge(original_live_essential, intern_checking_file, how='left', on=['artist_of_the_collection', 'single_title', 'youtube_url', 'filename'], validate='1:m').fillna(value='None')
+    # print(k)
 
 
 def get_uuid_for_artist_name():
@@ -325,18 +333,20 @@ if __name__ == "__main__":
     # INPUT HERE:
     # Input_url 'https://docs.google.com/spreadsheets/d/1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg/edit#gid=1704112717&fvid=1943649550'
     gsheet_id = '1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg'  # Single page
-    sheet_name = 'Oct - W3'
+    sheet_name = 'Oct - W4'
     original_live_essential = get_df_from_speadsheet(gsheet_id, sheet_name).fillna(value='None').applymap(
         str.lower).apply(lambda x: x.str.strip())
 
     # PROCESS HERE:
     # check_box()
+    intern_process()
+
     # crawl_itune_album()
     # check_crawl_E5_06_status()
     # check_get_trackid_from_ituneid_and_tracknum()
-    crawl_live_essential_youtube()
+    # crawl_live_essential_youtube()
 
     # get_datasourceid()
-    finalize_data()
+    # finalize_data()
     # update_date_live_essential()
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))

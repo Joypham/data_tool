@@ -2,6 +2,7 @@ import youtube_dl
 import time
 from youtube_dl.utils import DownloadError
 from core import youtube_com_cookies_path
+import json
 import traceback
 
 def get_title_uploader_from_youtube_url(youtube_url: str):
@@ -20,6 +21,8 @@ def get_title_uploader_from_youtube_url(youtube_url: str):
             youtube_url,
             download=False  # We just want to extract the info
         )
+        print(json.dumps(result)
+)
         youtube_info_result = {"youtube_url": youtube_url, "uploader": result.get('uploader'), "youtube_title": result.get('title')}
     except DownloadError as ex:
         youtube_info_result = {"youtube_url": youtube_url, "uploader": f"{ex}", "youtube_title": f"{ex}"}

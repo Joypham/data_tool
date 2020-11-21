@@ -512,7 +512,7 @@ def final_check():
 
     merge_df = pd.merge(original_sheet, query_df, how='left',
                         on='track_id').fillna(value='None')
-    # merge_df = merge_df.head(100)
+    merge_df = merge_df.head(100)
 
     row_index = merge_df.index
     get_youtube_titles = []
@@ -536,7 +536,7 @@ def final_check():
             get_youtube_titles.append(get_youtube_title)
             get_youtube_uploaders.append(get_youtube_uploader)
 
-            token_set_ratio_title = get_token_set_ratio(itune_title,get_youtube_title)
+            token_set_ratio_title = get_token_set_ratio(itune_title, get_youtube_title)
             token_set_ratio_artist = get_token_set_ratio(itune_artist, get_youtube_uploader)
 
             token_set_ratio_titles.append(token_set_ratio_title)
@@ -590,12 +590,12 @@ if __name__ == "__main__":
     # 'https://docs.google.com/spreadsheets/d/1MuEB6erMb8mD--HQLh85NDIcxL-coeoQ_wfB8ilyfak/edit#gid=1713188461'
 
     # test: https://docs.google.com/spreadsheets/d/18_xS2CK2sYMbIfDLEPtH2gS4s_CR9gwVeby18rnYrsQ/edit#gid=1072344548
-    gsheet_id = '18_xS2CK2sYMbIfDLEPtH2gS4s_CR9gwVeby18rnYrsQ'
+    gsheet_id = '1_vAYP7BSWM5b4I6AR4CX3KdTmKQQwjB46MoA-9J-1cE'
     sheet_info = sheet_type.MP4_SHEET_NAME
-    final_check()
+    # final_check()
 
     # Start tools:
-    # check_box()
+    check_box()
     # process_mp3_mp4(sheet_info)
     # process_version_sheet(sheet_info)
     print("--- %s seconds ---" % (time.time() - start_time))
