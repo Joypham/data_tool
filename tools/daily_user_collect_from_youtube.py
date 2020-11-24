@@ -14,7 +14,7 @@ def daily_user_collect_from_youtube():
     # Input_url 'https://docs.google.com/spreadsheets/d/1vlMsEjwBWuuxXecadJsEbBFeuVFAHZSbOz90JhXgioo/edit#gid=1088561556'
     gsheet_id = '1vlMsEjwBWuuxXecadJsEbBFeuVFAHZSbOz90JhXgioo'
     sheet_name = 'Sheet1'
-    new_title = f"Daily contribution {date.today()} joy xinh test"
+    new_title = f"Daily contribution {date.today()} test"
     print(new_title)
 
     # PROCESS HERE:
