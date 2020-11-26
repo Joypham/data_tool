@@ -30,7 +30,7 @@ def checking_lost_datasource_image_from_S3(datasource_ids: list):
     for db_datasource in db_datasources:
         resize_images = db_datasource.ext.get('resize_images')
         for resize_image in resize_images:
-            if db_datasource.is_video == 1:
+            if "berserker" in db_datasource.cdn:
                 key = f"videos/{resize_image}"
             else:
                 key = f"audio/{resize_image}"
@@ -85,13 +85,6 @@ def checking_lost_pip_from_S3(datasource_ids: list):
 
         else:
             print(f"formatid: {db_datasource.format_id} not required pip - True")
-
-
-
-
-
-
-
 
 
 def test_jay_lost_background_from_S3():

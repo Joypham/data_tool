@@ -589,13 +589,13 @@ if __name__ == "__main__":
     # Jane requirement: https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=653576103
     # 'https://docs.google.com/spreadsheets/d/1MuEB6erMb8mD--HQLh85NDIcxL-coeoQ_wfB8ilyfak/edit#gid=1713188461'
 
-    # test: https://docs.google.com/spreadsheets/d/18_xS2CK2sYMbIfDLEPtH2gS4s_CR9gwVeby18rnYrsQ/edit#gid=1072344548
-    gsheet_id = '1_vAYP7BSWM5b4I6AR4CX3KdTmKQQwjB46MoA-9J-1cE'
+    # test: https://docs.google.com/spreadsheets/d/1gBYClGWQEyv4-Fp3tgw_Vu8M0Z5uKrldoZl3ul2HrNg/edit#gid=0
+    gsheet_id = '18_xS2CK2sYMbIfDLEPtH2gS4s_CR9gwVeby18rnYrsQ'
     sheet_info = sheet_type.MP4_SHEET_NAME
     # final_check()
 
     # Start tools:
-    check_box()
-    # process_mp3_mp4(sheet_info)
+    # check_box()
+    process_mp3_mp4(sheet_info)
     # process_version_sheet(sheet_info)
     print("--- %s seconds ---" % (time.time() - start_time))

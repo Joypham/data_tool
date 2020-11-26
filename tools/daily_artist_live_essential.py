@@ -18,11 +18,17 @@ import numpy as np
 def intern_process():
     intern_checking_file = get_df_from_speadsheet(gsheet_id=gsheet_id, sheet_name= "iTunes checking!B3:U3939").applymap(
         str.lower).apply(lambda x: x.str.strip())
-    k1 = intern_checking_file
-    k = intern_checking_file['artist_of_the_collection','single_title', 'youtube_url', 'filename','Recheck ID', 'Track_title', 'Itunes_ID', 'album region', 'Itunes_Album_Link', 'Version', 'artist_name']
-    print(k.head(10))
-    # k = pd.merge(original_live_essential, intern_checking_file, how='left', on=['artist_of_the_collection', 'single_title', 'youtube_url', 'filename'], validate='1:m').fillna(value='None')
-    # print(k)
+
+    intern_checking_file = intern_checking_file[['artist_of_the_collection','single_title', 'youtube_url', 'filename','Recheck ID', 'Track_title', 'Itunes_ID', 'album region', 'Itunes_Album_Link', 'Version', 'artist_cover']]
+    merge_df = pd.merge(original_live_essential, intern_checking_file, how='left', on=['artist_of_the_collection', 'single_title', 'youtube_url', 'filename'], validate='1:m').fillna(value='None')
+    print(merge_df)
+
+    updated_df = merge_df[['Recheck ID', 'Track_title', 'Itunes_ID', 'album region', 'Itunes_Album_Link', 'Version', 'artist_cover']]
+    column_name = ['status', 'tracknum', 'ituneid', 'region', 'ituneurl', 'action_type', 'artist_cover']
+    list_result = updated_df.values.tolist()  # transfer data_frame to 2D list
+    list_result.insert(0, column_name)
+    range_to_update = f"{sheet_name}!U1"
+    update_value(list_result, range_to_update, gsheet_id)  # validate_value type: object, int, category... NOT DATETIME
 
 
 def get_uuid_for_artist_name():
@@ -145,6 +151,7 @@ def crawl_live_essential_youtube():
                                    & (raw_live_essential.track_id.notnull())
                                    ]
     row_index = filter_df.index
+
     with open(query_path, "w") as f:
         for i in row_index:
             id = get_uuid4()
@@ -157,11 +164,12 @@ def crawl_live_essential_youtube():
             artist_cover = filter_df.artist_cover.loc[i].translate(str.maketrans({'\"': '\\\"', '\'': '\\\''}))
             action_type = filter_df.action_type.loc[i]
             trackid = filter_df.track_id.loc[i]
-            if action_type == "LIVE_VIDEO":
+
+            if action_type == "live_video":
                 query = f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('{id}','{trackid}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{youtube_url}','$.data_source_format_id','7F8B6CD82F28437888BD029EFDA1E57F','$.concert_live_name','{place}','$.year','{year}','$.PIC', \"Joy_xinh\"),999);\n"
-            elif action_type == "COVER_VIDEO":
+            elif action_type == "cover_video":
                 query = f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('{id}','{trackid}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{youtube_url}','$.data_source_format_id','F5D2FE4A15FB405E988A7309FD3F9920','$.covered_artist_name','{artist_cover}','$.year','{year}','$.PIC', \"Joy_xinh\"),999);\n"
-            elif action_type == "FANCAM_VIDEO":
+            elif action_type == "fancam_video":
                 query = f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('{id}','{trackid}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{youtube_url}','$.data_source_format_id','DDC08421CAEB4E918F3FE373209020F9','$.concert_live_name','{place}','$.year','{year}','$.PIC', \"Joy_xinh\"),999);\n"
             else:
                 continue
@@ -331,19 +339,21 @@ if __name__ == "__main__":
     pd.set_option("display.max_rows", None, "display.max_columns", 80, 'display.width', 1000)
     start_time = time.time()
     # INPUT HERE:
-    # Input_url 'https://docs.google.com/spreadsheets/d/1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg/edit#gid=1704112717&fvid=1943649550'
+    # Input_url 'https://docs.google.com/spreadsheets/d/1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg/edit#gid=1212171874'
     gsheet_id = '1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg'  # Single page
-    sheet_name = 'Oct - W4'
+    sheet_name = 'Oct - W5'
     original_live_essential = get_df_from_speadsheet(gsheet_id, sheet_name).fillna(value='None').applymap(
         str.lower).apply(lambda x: x.str.strip())
 
     # PROCESS HERE:
-    # check_box()
     intern_process()
+    # check_box()
 
+    # intern_process()
     # crawl_itune_album()
     # check_crawl_E5_06_status()
     # check_get_trackid_from_ituneid_and_tracknum()
+
     # crawl_live_essential_youtube()
 
     # get_datasourceid()
