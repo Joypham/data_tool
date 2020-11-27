@@ -92,7 +92,7 @@ def test_jay_lost_background_from_S3():
         data = json.load(json_file)
 
     with open(query_path, "w") as f:
-        datasource_ids = get_all_datasource_valid(thread_session)
+        datasource_ids = get_all_datasource_valid()
         for db_datasource in datasource_ids:
             if 'bg_720_file_name' in db_datasource.ext.keys():
                 bg_720_file_name = db_datasource.ext['bg_720_file_name']
@@ -125,22 +125,25 @@ def test_jay_lost_background_from_S3():
             f.write(k + "\n")
 
 
-if __name__ == "__main__":
-    pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
 
-    datasource_ids = [
-        "8347F159221A41EEB6157FC7B0902D5C"
 
-    ]
-    for datasource_id in datasource_ids:
+# if __name__ == "__main__":
+#     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
 
-        datasource_id_list = [datasource_id]
-        print("\n ---", datasource_id, "--- \n")
-
-        print(get_df_from_query(related_datasourceid(datasource_id)))
-        checking_lost_datasource_filename_from_S3(datasource_id_list)
-        # checking_lost_datasource_image_from_S3(datasource_id_list)
-        checking_lost_datasource_background_from_S3(datasource_id_list)
-        checking_lost_pip_from_S3(datasource_id_list)
+    # datasource_ids = [
+    #     "8347F159221A41EEB6157FC7B0902D5C"
+    #
+    # ]
+    # for datasource_id in datasource_ids:
+    #
+    #     datasource_id_list = [datasource_id]
+    #     print("\n ---", datasource_id, "--- \n")
+    #
+    #     print(get_df_from_query(related_datasourceid(datasource_id)))
+    #     checking_lost_datasource_filename_from_S3(datasource_id_list)
+    #     # checking_lost_datasource_image_from_S3(datasource_id_list)
+    #     checking_lost_datasource_background_from_S3(datasource_id_list)
+    #     checking_lost_pip_from_S3(datasource_id_list)
+    # test()
 
 

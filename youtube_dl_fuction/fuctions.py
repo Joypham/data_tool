@@ -33,9 +33,6 @@ def get_title_uploader_from_youtube_url(youtube_url: str):
 
 if __name__ == "__main__":
     start_time = time.time()
-
-    youtube_url = "https://www.youtube.com/watch?v=x_XlqZk1jW0"
-
+    youtube_url = "https://www.youtube.com/watch?v=nDlVd5KQQ4s"
     get_title_uploader_from_youtube_url(youtube_url)
-
     print("--- %s seconds ---" % (time.time() - start_time))
