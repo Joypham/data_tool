@@ -182,4 +182,9 @@ def get_sheet_id_from_sheet_title(gsheet_id: str, title: str):
             return sheet_id
             break
 
+def get_gsheet_name(gsheet_id: str):
+    sheet_metadata = service().spreadsheets().get(spreadsheetId='1gBYClGWQEyv4-Fp3tgw_Vu8M0Z5uKrldoZl3ul2HrNg').execute()
+    gsheet_name = sheet_metadata.get('properties').get('title')
+    return gsheet_name
+
 

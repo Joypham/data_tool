@@ -36,7 +36,6 @@ if __name__ == "__main__":
     for url in urls:
         # k = get_video_decode(url)
         # print(f"{k} ----{url}")
-
         get_video_image(url)
 
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))

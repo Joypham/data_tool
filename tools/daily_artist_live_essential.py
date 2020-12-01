@@ -22,13 +22,12 @@ def intern_process():
     “many_to_one” or “m:1”: check if merge keys are unique in right dataset.
     “many_to_many” or “m:m”: allowed, but does not result in checks.
     '''
-    intern_checking_file = get_df_from_speadsheet(gsheet_id=gsheet_id, sheet_name= "iTunes checking!B3:U3939").applymap(
+    intern_checking_file = get_df_from_speadsheet(gsheet_id=gsheet_id, sheet_name= "iTunes checking!B3:V10000").applymap(
         str.lower).apply(lambda x: x.str.strip())
 
     intern_checking_file = intern_checking_file[['artist_of_the_collection','single_title', 'youtube_url', 'filename','Recheck ID', 'Track_title', 'Itunes_ID', 'album region', 'Itunes_Album_Link', 'Version', 'artist_cover']]
     merge_column = ['artist_of_the_collection', 'single_title', 'youtube_url', 'filename']
     merge_df = pd.merge(original_live_essential, intern_checking_file, how='left', on=merge_column, validate='1:m').fillna(value='None').drop_duplicates(subset=merge_column, keep='last')
-    print(merge_df)
 
     updated_df = merge_df[['Recheck ID', 'Track_title', 'Itunes_ID', 'album region', 'Itunes_Album_Link', 'Version', 'artist_cover']]
     column_name = ['status', 'tracknum', 'ituneid', 'region', 'ituneurl', 'action_type', 'artist_cover']
@@ -297,7 +296,6 @@ def check_box():
     df = pd.DataFrame(data=d)
     print(df)
 
-
 def update_date_live_essential():
     df = get_df_from_speadsheet(gsheet_id, sheet_name)[
         ['status', 'user_uuid', 'artist_uuid', 'genre_uuid', 'PlaylistName', 'playlist_id', 'datasource_id',
@@ -349,7 +347,7 @@ if __name__ == "__main__":
     # INPUT HERE:
     # Input_url 'https://docs.google.com/spreadsheets/d/1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg/edit#gid=1212171874'
     gsheet_id = '1uK18IYVtUv-_xXSuossOdLZkrMwRT_49mz9oVLT4DUg'  # Single page
-    sheet_name = 'Nov - W1'
+    sheet_name = 'Nov - W2'
     original_live_essential = get_df_from_speadsheet(gsheet_id, sheet_name).fillna(value='None').applymap(
         str.lower).apply(lambda x: x.str.strip())
 
@@ -362,7 +360,7 @@ if __name__ == "__main__":
     # check_get_trackid_from_ituneid_and_tracknum()
     # crawl_live_essential_youtube()
 
-    get_datasourceid()
+    # get_datasourceid()
     # finalize_data()
     # update_date_live_essential()
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))

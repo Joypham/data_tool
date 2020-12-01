@@ -1,4 +1,4 @@
-from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title, update_value, creat_new_sheet_and_update_data_from_df
+from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title, update_value, creat_new_sheet_and_update_data_from_df, get_gsheet_name
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
 from core.crud.sql.datasource import get_datasourceid_from_youtube_url_and_trackid, related_datasourceid, get_youtube_info_from_trackid
@@ -28,7 +28,6 @@ class sheet_type:
                                                                     DataSourceFormatMaster.FORMAT_ID_MP4_LIVE],
                           "column_name": ["track_id", "Remix_url", "Remix_artist", "Live_url", "Live_venue",
                                           "Live_year"]}
-
 
 def check_youtube_url_mp3():
     '''
@@ -421,7 +420,8 @@ def process_mp3_mp4(sheet_info: dict):
     if checking == 1:
         return print("Please recheck check_box")
     else:
-        original_df = get_df_from_speadsheet(gsheet_id, sheet_info['sheet_name'])
+        sheet_name = sheet_info['sheet_name']
+        original_df = get_df_from_speadsheet(gsheet_id, sheet_name)
         youtube_url = original_df[sheet_info['column_name']]
         file_to_process = youtube_url[
             (youtube_url['Memo'] == 'not ok') | (youtube_url['Memo'] == 'added')].reset_index().drop_duplicates(
@@ -455,9 +455,9 @@ def process_mp3_mp4(sheet_info: dict):
                                 query = query + f"UPDATE datasources SET updatedAt = NOW() WHERE trackid = '{track_id}';\n"
 
                 elif memo == "not ok" and new_youtube_url != "none":
-                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','replace' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{datasource_format_id}','$.PIC', \"Joy_xinh\"),999);\n"
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','replace' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{datasource_format_id}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
                 elif memo == "added":
-                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','skip' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{datasource_format_id}','$.PIC', \"Joy_xinh\"),999);\n"
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','skip' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{datasource_format_id}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
                 f.write(query)
 
 
@@ -471,7 +471,8 @@ def process_version_sheet(sheet_info: dict):
     if checking == 1:
         return print("Please recheck check_box")
     else:
-        original_df = get_df_from_speadsheet(gsheet_id, sheet_info['sheet_name'])
+        sheet_name = sheet_info['sheet_name']
+        original_df = get_df_from_speadsheet(gsheet_id, sheet_name)
         youtube_url = original_df[sheet_info['column_name']]
         file_to_process = youtube_url[
             (youtube_url['Remix_url'] != '') | (youtube_url['Live_url'] != '')].reset_index().drop_duplicates(
@@ -489,13 +490,13 @@ def process_version_sheet(sheet_info: dict):
                 Live_year = file_to_process.Live_year.loc[i]
                 query = ""
                 if Remix_url != '':
-                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Remix_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_REMIX}','$.remix_artist','{Remix_artist}','$.PIC', \"Joy_xinh\"),999);\n"
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Remix_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_REMIX}','$.remix_artist','{Remix_artist}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
                 else:
                     pass
                 if Live_url != '' and Live_year != '':
-                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Live_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_LIVE}','$.concert_live_name','{Live_venue}','$.year','{Live_year}','$.PIC', \"Joy_xinh\"),999);\n"
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Live_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_LIVE}','$.concert_live_name','{Live_venue}','$.year','{Live_year}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
                 elif Live_url != '' and Live_year == '':
-                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Live_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_LIVE}','$.concert_live_name','{Live_venue}','$.PIC', \"Joy_xinh\"),999);\n"
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Live_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_LIVE}','$.concert_live_name','{Live_venue}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
                 else:
                     pass
                 print(query)
@@ -589,9 +590,11 @@ if __name__ == "__main__":
     # Jane requirement: https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=653576103
     # 'https://docs.google.com/spreadsheets/d/1MuEB6erMb8mD--HQLh85NDIcxL-coeoQ_wfB8ilyfak/edit#gid=1713188461'
 
-    # test: https://docs.google.com/spreadsheets/d/1gBYClGWQEyv4-Fp3tgw_Vu8M0Z5uKrldoZl3ul2HrNg/edit#gid=0
-    gsheet_id = '18_xS2CK2sYMbIfDLEPtH2gS4s_CR9gwVeby18rnYrsQ'
-    sheet_info = sheet_type.MP4_SHEET_NAME
+    # test: https://docs.google.com/spreadsheets/d/1gBYClGWQEyv4-Fp3tgw_Vu8M0Z5uKrldoZl3ul2HrNg/edit#gid=1537202324
+    gsheet_id = '1gBYClGWQEyv4-Fp3tgw_Vu8M0Z5uKrldoZl3ul2HrNg'
+    gsheet_name = get_gsheet_name(gsheet_id=gsheet_id)
+    # print(gsheet_name)
+    sheet_info = sheet_type.MP3_SHEET_NAME
     # final_check()
 
     # Start tools:
