@@ -291,8 +291,8 @@ if __name__ == "__main__":
     # upload_track_wiki()
     # upload_track_lyrics()
 
-    # crawl_artist_image_singlepage()
-    crawl_artist_image_albumpage()
+    crawl_artist_image_singlepage()
+    # crawl_artist_image_albumpage()
 
 
     # update_wiki_singlepage()

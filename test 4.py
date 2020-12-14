@@ -47,18 +47,19 @@ def test_2(uri):
     response = requests.get(uri)
     image_bytes = io.BytesIO(response.content)
     img = Image.open(image_bytes)
-    return img.size[0]
+    return img.size
 
 
 if __name__ == "__main__":
     start_time = time.time()
-    # uri = "https://s3.amazonaws.com/vibbidi-images/artists/img_D1F90D01CB164FD5B970D06EB0E7033B.2020.06.11.15.21.13.small.jpg"
-    # test_2(uri)
-    artist_uuids = [
-        "71BBDC06F6F34983853B3EAF5491EACA",
-        "D96658C02F8C4293A16AE37CE2CBC387",
-        "1422E730478D4EFFB637B0319A50F2FD"
-    ]
-    get_artist_image_url(artist_uuids)
+    uri = "https://aimg.vibbidi-vid.com/vibbidi-images/artists/img_E560F23B0B074F1DB2996070C11CA43D.2019.09.05.14.51.47.medium.jpg"
+    k = test_2(uri)
+    print(k)
+    # artist_uuids = [
+    #     "71BBDC06F6F34983853B3EAF5491EACA",
+    #     "D96658C02F8C4293A16AE37CE2CBC387",
+    #     "1422E730478D4EFFB637B0319A50F2FD"
+    # ]
+    # get_artist_image_url(artist_uuids)
 
     print("--- %s seconds ---" % (time.time() - start_time))

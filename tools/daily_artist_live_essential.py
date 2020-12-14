@@ -6,6 +6,7 @@ from core.crud.sql.artist import get_uuid_and_count_from_artist_name
 from core.crud.sql.genre import get_genre_uuid_from_genre_name
 from core.crud.sql.crawlingtask import get_crawl_E5_06_status, get_datasourceId_from_crawlingtask
 from core.crud.sql.external_identity import get_trackid_from_ituneid_and_tracknum
+from youtube_dl_fuction.fuctions import get_raw_title_uploader_from_youtube_url
 
 from support_function.text_similarity.text_similarity import get_token_set_ratio
 
@@ -13,16 +14,49 @@ from tools.get_uuid4 import get_uuid4
 import time
 import pandas as pd
 from core import query_path
+from numpy import random
 import numpy as np
 
-def intern_process():
+def intern_checking_process():
+    df = get_df_from_speadsheet(gsheet_id=gsheet_id, sheet_name= "iTunes checking!B3:V10000").apply(lambda x: x.str.strip())
+    df = df.head(30)
+    row_index = df.index
+    get_youtube_titles = []
+    get_youtube_uploaders = []
+    for i in row_index:
+        youtube_url = df.youtube_url.loc[i]
+        status = df['recheck_id'].loc[i]
+        if status == "ok":
+            get_youtube_info = get_raw_title_uploader_from_youtube_url(youtube_url)
+            get_youtube_title = get_youtube_info['youtube_title']
+            get_youtube_uploader = get_youtube_info['uploader']
+        else:
+            get_youtube_title = "not to check"
+            get_youtube_uploader = "not to check"
+
+        get_youtube_titles.append(get_youtube_title)
+        get_youtube_uploaders.append(get_youtube_uploader)
+
+        x = random.uniform(0.5, 3)
+        time.sleep(x)
+
+
+    se_youtube_title = pd.Series(get_youtube_titles)
+    se_youtube_uploader = pd.Series(get_youtube_uploaders)
+    df['get_youtube_title'] = se_youtube_title.values
+    df['get_youtube_uploader'] = se_youtube_uploader.values
+    print(df)
+
+
+
+def loop_data_from_intern_process():
     '''
     :return:“one_to_one” or “1:1”: check if merge keys are unique in both left and right datasets.
     “one_to_many” or “1:m”: check if merge keys are unique in left dataset.
     “many_to_one” or “m:1”: check if merge keys are unique in right dataset.
     “many_to_many” or “m:m”: allowed, but does not result in checks.
     '''
-    intern_checking_file = get_df_from_speadsheet(gsheet_id=gsheet_id, sheet_name= "iTunes checking!B3:V10000").applymap(
+    intern_checking_file = get_df_from_speadsheet(gsheet_id=gsheet_id, sheet_name= "iTunes checking!B3:U10000").applymap(
         str.lower).apply(lambda x: x.str.strip())
 
     intern_checking_file = intern_checking_file[['artist_of_the_collection','single_title', 'youtube_url', 'filename','Recheck ID', 'Track_title', 'Itunes_ID', 'album region', 'Itunes_Album_Link', 'Version', 'artist_cover']]
@@ -352,9 +386,10 @@ if __name__ == "__main__":
         str.lower).apply(lambda x: x.str.strip())
 
     # PROCESS HERE:
-    # intern_process()
+    # intern_checking_process()
+    # loop_data_from_intern_process()
     # check_box()
-    # crawl_itune_album()
+    crawl_itune_album()
 
     # check_crawl_E5_06_status()
     # check_get_trackid_from_ituneid_and_tracknum()

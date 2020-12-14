@@ -1,7 +1,7 @@
 from core.crud.sql.pointlog import collect_from_youtube_query
 from core.crud.get_df_from_query import get_df_from_query
 from datetime import date
-from youtube_dl_fuction.fuctions import get_title_uploader_from_youtube_url
+from youtube_dl_fuction.fuctions import get_raw_title_uploader_from_youtube_url
 import time
 import pandas as pd
 from numpy import random
@@ -35,9 +35,9 @@ def daily_user_collect_from_youtube():
         youtube_uploader = df.youtube_uploader.loc[i]
         youtube_url = df.contribution_url.loc[i]
         if youtube_title == 'None':
-            get_youtube_info = get_title_uploader_from_youtube_url(youtube_url)
+            get_youtube_info = get_raw_title_uploader_from_youtube_url(youtube_url)
 
-            get_youtube_title = get_youtube_info['youtube_title']
+            get_youtube_title = get_youtube_info['Mp3_link']
             get_youtube_uploader = get_youtube_info['uploader']
 
             get_youtube_titles.append(get_youtube_title)

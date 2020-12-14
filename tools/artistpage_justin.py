@@ -5,7 +5,7 @@ from core.crud.sql.datasource import get_datasourceid_from_youtube_url_and_track
 from core.models.data_source_format_master import DataSourceFormatMaster
 from core.crud.get_df_from_query import get_df_from_query
 
-from youtube_dl_fuction.fuctions import get_title_uploader_from_youtube_url
+from youtube_dl_fuction.fuctions import get_raw_title_uploader_from_youtube_url
 
 from tools import get_uuid4
 from itertools import chain
@@ -455,9 +455,9 @@ def process_mp3_mp4(sheet_info: dict):
                                 query = query + f"UPDATE datasources SET updatedAt = NOW() WHERE trackid = '{track_id}';\n"
 
                 elif memo == "not ok" and new_youtube_url != "none":
-                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','replace' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{datasource_format_id}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values (uuid4(),'{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','replace' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{datasource_format_id}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
                 elif memo == "added":
-                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','skip' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{datasource_format_id}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values (uuid4(),'{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','skip' ,'$.youtube_url','{new_youtube_url}','$.data_source_format_id','{datasource_format_id}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
                 f.write(query)
 
 
@@ -480,7 +480,7 @@ def process_version_sheet(sheet_info: dict):
             keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
 
         row_index = file_to_process.index
-        with open(query_path, "w") as f:
+        with open(query_path, "a") as f:
             for i in row_index:
                 Remix_url = file_to_process.Remix_url.loc[i]
                 Remix_artist = file_to_process.Remix_artist.loc[i]
@@ -490,13 +490,13 @@ def process_version_sheet(sheet_info: dict):
                 Live_year = file_to_process.Live_year.loc[i]
                 query = ""
                 if Remix_url != '':
-                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Remix_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_REMIX}','$.remix_artist','{Remix_artist}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values (uuid4(),'{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Remix_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_REMIX}','$.remix_artist','{Remix_artist}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
                 else:
                     pass
                 if Live_url != '' and Live_year != '':
-                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Live_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_LIVE}','$.concert_live_name','{Live_venue}','$.year','{Live_year}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values (uuid4(),'{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Live_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_LIVE}','$.concert_live_name','{Live_venue}','$.year','{Live_year}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
                 elif Live_url != '' and Live_year == '':
-                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values ('uuid4()','{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Live_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_LIVE}','$.concert_live_name','{Live_venue}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
+                    query = query + f"insert into crawlingtasks(Id,ObjectID ,ActionId, TaskDetail, Priority) values (uuid4(),'{track_id}' ,'F91244676ACD47BD9A9048CF2BA3FFC1',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()),'$.when_exists','keep both' ,'$.youtube_url','{Live_url}','$.data_source_format_id','{DataSourceFormatMaster.FORMAT_ID_MP4_LIVE}','$.concert_live_name','{Live_venue}','$.PIC', '{gsheet_name}_{sheet_name}'),300);\n"
                 else:
                     pass
                 print(query)
@@ -530,7 +530,7 @@ def final_check():
         itune_artist = merge_df['Artist Track on iTunes'].loc[i]
 
         if "https://www.youtube.com/watch?v=" in youtube_url and (youtube_title == 'None' or youtube_title == "\"_\""):
-            get_youtube_info = get_title_uploader_from_youtube_url(youtube_url)
+            get_youtube_info = get_raw_title_uploader_from_youtube_url(youtube_url)
             get_youtube_title = get_youtube_info['youtube_title']
             get_youtube_uploader = get_youtube_info['uploader']
 

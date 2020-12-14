@@ -11,6 +11,7 @@ from core.models.collection_datasource import CollectionDataSource
 from core.models.data_source_format_master import DataSourceFormatMaster
 
 from typing import Optional, Tuple, Dict, List
+from core.crud.sqlalchemy import get_compiled_raw_mysql
 from itertools import chain
 
 from core.crud.get_df_from_query import get_df_from_query
@@ -81,8 +82,39 @@ def get_youtube_info_from_trackid(track_ids: list, format_id):
     return datasourceid
 
 
+def get_youtube_title_and_youtube_uploader_from_youtube_url(youtube_url: str):
+    datasourceid = (db_session.query(
+        DataSource.source_uri.label('youtube_url'),
+        func.json_extract(DataSource.info, "$.source.title").label(
+            "youtube_title"),
+        func.json_extract(DataSource.info, "$.source.uploader").label(
+            "youtube_uploader"))
+                    .select_from(DataSource)
+                    .filter(DataSource.source_uri == youtube_url,
+                            DataSource.valid == 1
+                            )
+                    ).group_by(DataSource.track_id).order_by(DataSource.created_at.desc())
+    return datasourceid
+
+
+def get_one_by_youtube_url(youtube_url: str):
+    return db_session.query(DataSource).filter((DataSource.valid == 1),
+                                               DataSource.source_uri == youtube_url
+                                               ).order_by(
+        DataSource.created_at.desc()).limit(1)
+
+
+def get_list_datasourceid():
+     datasourceid = db_session.query(DataSource.id).filter(DataSource.valid == 1,
+                                               DataSource.updated_at > '2020-10-01'
+                                               ).order_by(
+        DataSource.updated_at.desc())
+     return datasourceid
+
+
 if __name__ == "__main__":
-    track_ids = ["C865654002BC42DDBF0B44F4D8A1C16D"]
-    format_id = DataSourceFormatMaster.FORMAT_ID_MP3_FULL
-    joy = get_compiled_raw_mysql(get_youtube_info_from_trackid(track_ids, format_id))
+    # track_ids = ["C865654002BC42DDBF0B44F4D8A1C16D"]
+    url = 'https://www.youtube.com/watch?v=RGiKQaiaVHE'
+    # format_id = DataSourceFormatMaster.FORMAT_ID_MP3_FULL
+    joy = get_compiled_raw_mysql(get_list_datasourceid())
     print(joy)
