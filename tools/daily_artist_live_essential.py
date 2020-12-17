@@ -389,13 +389,13 @@ if __name__ == "__main__":
     # intern_checking_process()
     # loop_data_from_intern_process()
     # check_box()
-    crawl_itune_album()
+    # crawl_itune_album()
 
     # check_crawl_E5_06_status()
     # check_get_trackid_from_ituneid_and_tracknum()
-    # crawl_live_essential_youtube()
+    crawl_live_essential_youtube()
 
     # get_datasourceid()
     # finalize_data()
-    # update_date_live_essential()
+    update_date_live_essential()
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))

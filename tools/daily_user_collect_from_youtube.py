@@ -14,7 +14,7 @@ def daily_user_collect_from_youtube():
     # Input_url 'https://docs.google.com/spreadsheets/d/1vlMsEjwBWuuxXecadJsEbBFeuVFAHZSbOz90JhXgioo/edit#gid=1088561556'
     gsheet_id = '1vlMsEjwBWuuxXecadJsEbBFeuVFAHZSbOz90JhXgioo'
     sheet_name = 'Sheet1'
-    new_title = f"Daily contribution {date.today()} test"
+    new_title = f"Daily contribution {date.today()}"
     print(new_title)
 
     # PROCESS HERE:
@@ -58,7 +58,7 @@ def daily_user_collect_from_youtube():
 
     # print("\n", "Get data result \n", df)
     # STEP 2: Create sheet and update data to sheet
-    creat_new_sheet_and_update_data_from_df(df, gsheet_id, new_title)
+    # creat_new_sheet_and_update_data_from_df(df, gsheet_id, new_title)
 
     print("\n --- %s seconds ---" % (time.time() - start_time1))
 

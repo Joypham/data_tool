@@ -41,11 +41,25 @@ def get_all_by_track_ids(trackids: list):
         Track.created_at.desc()).all()
 
 
-# if __name__ == "__main__":
-#     trackid = 'DE365F7B42C646199F372F6A24C42994'
-#     db_tracks = get_all_by_track_id(trackid)
-#     print(db_tracks.id)
-    # for db_track in db_tracks:
-    #     print(db_track.id)
-    #     print(db_track.ext)
+def get_one_by_id(track_id: str):
+    return db_session.query(Track).filter((Track.valid == 1),
+                                          Track.id == track_id).all()[0]
 
+
+if __name__ == "__main__":
+    # k = get_compiled_raw_mysql(get_one_by_ids('1D379486D15C4D748056B3DE0D9D6249'))
+    # print(k)
+
+    trackid = '4DA767501B9C4180AE8D541B51B59C3A'
+    db_track = get_one_by_id(trackid)
+    print(db_track.title)
+
+    # print(db_track.title)
+
+    # for info in db_track:
+    #     print(info)
+
+#     print(db_tracks.id)
+# for db_track in db_tracks:
+#     print(db_track.id)
+#     print(db_track.ext)

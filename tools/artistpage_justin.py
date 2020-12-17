@@ -483,10 +483,10 @@ def process_version_sheet(sheet_info: dict):
         with open(query_path, "a") as f:
             for i in row_index:
                 Remix_url = file_to_process.Remix_url.loc[i]
-                Remix_artist = file_to_process.Remix_artist.loc[i]
+                Remix_artist = file_to_process.Remix_artist.loc[i].replace('\'', '\\\'').replace("\"", "\\\"")
                 track_id = file_to_process.track_id.loc[i]
                 Live_url = file_to_process.Live_url.loc[i]
-                Live_venue = file_to_process.Live_venue.loc[i]
+                Live_venue = file_to_process.Live_venue.loc[i].replace('\'', '\\\'').replace("\"", "\\\"")
                 Live_year = file_to_process.Live_year.loc[i]
                 query = ""
                 if Remix_url != '':
