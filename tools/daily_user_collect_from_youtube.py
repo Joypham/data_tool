@@ -27,6 +27,7 @@ def daily_user_collect_from_youtube():
     df['contribution_url'] = df['contribution_url'].apply(lambda x: x.replace('"', ""))
     # df = df.head(100)
 
+
     row_index = df.index
     get_youtube_titles = []
     get_youtube_uploaders = []
@@ -37,7 +38,7 @@ def daily_user_collect_from_youtube():
         if youtube_title == 'None':
             get_youtube_info = get_raw_title_uploader_from_youtube_url(youtube_url)
 
-            get_youtube_title = get_youtube_info['Mp3_link']
+            get_youtube_title = get_youtube_info['youtube_title']
             get_youtube_uploader = get_youtube_info['uploader']
 
             get_youtube_titles.append(get_youtube_title)
@@ -55,6 +56,8 @@ def daily_user_collect_from_youtube():
     df['get_youtube_title'] = se_youtube_title.values
     df['get_youtube_uploader'] = se_youtube_uploader.values
     print(df)
+
+
 
     # print("\n", "Get data result \n", df)
     # STEP 2: Create sheet and update data to sheet
