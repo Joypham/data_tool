@@ -29,4 +29,18 @@ def get_compiled_raw_mysql(query):
     return stmt.compile(dialect=mysql.dialect(), compile_kwargs={"literal_binds": True})
 
 
-
+def page_query(query, item_per_query=1000):
+    """
+    :param query: Query
+    :param item_per_query: int
+    :return:
+    """
+    offset = 0
+    while True:
+        r = False
+        for element in query.limit(item_per_query).offset(offset):
+            r = True
+            yield element
+        offset += item_per_query
+        if not r:
+            break

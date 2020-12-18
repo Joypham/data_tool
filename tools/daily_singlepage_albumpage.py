@@ -5,7 +5,7 @@ from core.crud.sql.track import get_track_wiki, get_track_lyric
 from core.crud.sql.crawlingtask import get_crawl_artist_image_status, get_artist_image_cant_crawl
 from core.crud.get_df_from_query import get_df_from_query
 
-from google_spreadsheet_api.function import add_sheet, get_list_of_sheet_title, update_value, get_df_from_speadsheet
+from google_spreadsheet_api.function import  get_list_of_sheet_title, update_value, get_df_from_speadsheet, get_gsheet_name
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
 import time
@@ -105,7 +105,7 @@ def crawl_artist_image_singlepage():
         for i in row_index:
             x = filter_df['Artist_UUID'].loc[i]
             y = filter_df['artist_url_to_add'].loc[i]
-            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{x}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{y}','$.object_type',\"artist\",'$.when_exists',\"replace\",'$.PIC',\"Joy_xinh\"),99);"
+            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{x}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{y}','$.object_type',\"artist\",'$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),99);"
             f.write(query + "\n")
 
     # Step 3: automation check crawl_artist_image_status then export result:
@@ -150,7 +150,7 @@ def crawl_artist_image_albumpage():
         for i in row_index:
             x = filter_df['Artist_UUID'].loc[i]
             y = filter_df['artist_url_to_add'].loc[i]
-            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{x}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{y}','$.object_type',\"artist\",'$.when_exists',\"replace\",'$.PIC',\"Joy_xinh\"),99);"
+            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{x}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{y}','$.object_type',\"artist\",'$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),99);"
             f.write(query + "\n")
 
     # Step 3: automation check crawl_artist_image_status then export result:
@@ -285,13 +285,14 @@ if __name__ == "__main__":
     # sheet_name = '26.10.2020'
 
     list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
+    gsheet_name = get_gsheet_name(gsheet_id=gsheet_id)
 
     # Start tool:
     # upload_album_wiki()
     # upload_track_wiki()
     # upload_track_lyrics()
 
-    crawl_artist_image_singlepage()
+    # crawl_artist_image_singlepage()
     # crawl_artist_image_albumpage()
 
 
