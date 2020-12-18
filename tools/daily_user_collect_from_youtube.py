@@ -61,7 +61,7 @@ def daily_user_collect_from_youtube():
 
     # print("\n", "Get data result \n", df)
     # STEP 2: Create sheet and update data to sheet
-    # creat_new_sheet_and_update_data_from_df(df, gsheet_id, new_title)
+    creat_new_sheet_and_update_data_from_df(df, gsheet_id, new_title)
 
     print("\n --- %s seconds ---" % (time.time() - start_time1))
 

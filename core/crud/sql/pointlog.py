@@ -45,13 +45,12 @@ def collect_from_youtube_query():
                                   .select_from(PointLog)
                                   .outerjoin(Crawlingtask,
                                              text("crawlingtasks.id = pointlogs.ext ->> '$.crawler_id'"))
-                                  .outerjoin(Track,
-                                             (Track.id == PointLog.target_id) & (Track.id != "") & (Track.valid == 1))
                                   .outerjoin(Album_Track,
-                                             (Album_Track.track_id == PointLog.target_id) & (
-                                                     Album_Track.track_id != ""))
+                                             (Album_Track.track_id == PointLog.target_id))
                                   .outerjoin(Album,
-                                             (Album.uuid == Album_Track.album_uuid) & (Album.uuid != ""))
+                                             (Album.uuid == Album_Track.album_uuid) & (Album.valid == 1))
+                                  .outerjoin(Track,
+                                             (Track.id == Album_Track.track_id) & (Track.id != "") & (Track.valid == 1))
                                   .outerjoin(DataSource,
                                              text("datasources.id = crawlingtasks.ext ->> '$.data_source_id'"))
                                   .filter(PointLog.action_type == "CY",
