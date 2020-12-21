@@ -6,7 +6,7 @@ query_path = os.path.join(BASE_DIR, "sources", "query.txt")
 credentials_path = os.path.join(BASE_DIR, "sources", "credentials.json")
 token_path = os.path.join(BASE_DIR, "sources", "token.pickle")
 youtube_com_cookies_path = os.path.join(BASE_DIR, "sources", "youtube_com_cookies.txt")
-config_path = os.path.join(CORE_DIR, "database_connection", "config.json")
+config_path = os.path.join(CORE_DIR, "mysql_database_connection", "config.json")
 
 
 

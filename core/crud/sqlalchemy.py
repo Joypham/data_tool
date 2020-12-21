@@ -9,7 +9,7 @@ from sqlalchemy import text
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy import func, union, distinct, desc
-from core.database_connection.sqlalchemy_create_engine import SQLALCHEMY_DATABASE_URI
+from core.mysql_database_connection.sqlalchemy_create_engine import SQLALCHEMY_DATABASE_URI
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))

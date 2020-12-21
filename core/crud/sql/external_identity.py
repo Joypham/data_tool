@@ -7,7 +7,7 @@ from core.models.artist_album import Artist_album
 from core.models.artist import Artist
 from core.models.itunes_album_tracks_release import ItunesRelease
 from core.models.track import Track
-from core.database_connection.sqlalchemy_create_engine import SQLALCHEMY_DATABASE_URI
+from core.mysql_database_connection.sqlalchemy_create_engine import SQLALCHEMY_DATABASE_URI
 from core.crud.sqlalchemy import get_compiled_raw_mysql
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)

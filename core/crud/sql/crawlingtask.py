@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker, aliased
 from sqlalchemy import func, union, distinct, desc
 from sqlalchemy import text
-from core.database_connection.sqlalchemy_create_engine import SQLALCHEMY_DATABASE_URI
+from core.mysql_database_connection.sqlalchemy_create_engine import SQLALCHEMY_DATABASE_URI
 from datetime import date
 
 from core.crud.sqlalchemy import get_compiled_raw_mysql
