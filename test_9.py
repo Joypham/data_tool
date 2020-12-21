@@ -1,6 +1,8 @@
 from google_spreadsheet_api.function import update_value
 from google_spreadsheet_api.function import get_df_from_speadsheet
 from core.crud.get_df_from_query import get_df_from_query
+from core.crud.sql.datasource import get_all_by_youtube_url
+
 
 from youtube_dl_fuction.fuctions import get_raw_title_uploader_from_youtube_url
 

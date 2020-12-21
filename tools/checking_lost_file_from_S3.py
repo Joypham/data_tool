@@ -92,6 +92,7 @@ if __name__ == "__main__":
     sheet_name = 'DatasourceID'
     df = get_df_from_speadsheet(gsheet_id=gsheetid, sheet_name=sheet_name)
     list_dsid = df['datasourceid'].values.tolist()
+    # print(list_dsid)
     # list_dsid = ["0E8F169898BA496A9749D2B34F828696", "143908C73F4B4864A84A50BB778EC5ED"]
     checking_lost_datasource_from_S3(list_dsid)
 
