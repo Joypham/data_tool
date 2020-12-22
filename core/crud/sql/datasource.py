@@ -99,11 +99,11 @@ def get_youtube_title_and_youtube_uploader_from_youtube_url(youtube_url: str):
 
 def get_one_youtube_url_and_youtube_uploader_by_youtube_url(youtube_url: str):
     return db_session.query(DataSource).filter((DataSource.valid == 1),
-                                               func.json_extract(DataSource.info, "$.source.uploader".is_(None)),
-                                               func.json_extract(DataSource.info, "$.source.title".is_(None)),
+                                               func.json_extract(DataSource.info, "$.source.uploader") != None,
+                                               func.json_extract(DataSource.info, "$.source.title") != None,
                                                DataSource.source_uri == youtube_url
                                                ).order_by(
-        DataSource.created_at.desc()).limit(1)
+        DataSource.created_at.desc()).limit(1).all()
 
 
 def get_list_datasourceid():
