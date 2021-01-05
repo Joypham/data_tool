@@ -275,14 +275,14 @@ if __name__ == "__main__":
     start_time = time.time()
     pd.set_option("display.max_rows", None, "display.max_columns", 30, 'display.width', 500)
     # INPUT HERE:
-    # Input_url 'https://docs.google.com/spreadsheets/d/1wRe7nWNZbomMHjgp0MFXu20oonGS6zuA9hv6AD7G8VA/edit#gid=0'
+    # Input_url 'https://docs.google.com/spreadsheets/d/1S2HD6IL_QdgFNgdm3811JBY3pX9UE2Oa36C_tulpJBw/edit#gid=2066669079'
 
-    gsheet_id = '1wRe7nWNZbomMHjgp0MFXu20oonGS6zuA9hv6AD7G8VA'  # Album page
-    sheet_name = '09.11.2020'
+    gsheet_id = '1S2HD6IL_QdgFNgdm3811JBY3pX9UE2Oa36C_tulpJBw'  # Album page
+    sheet_name = '21.12.2020'
 
     # Input_url 'https://docs.google.com/spreadsheets/d/1j_8tC9q9--6oXxmnNt1CkimBaNunaLl-p2UzrFrb2hk/edit#gid=737499827'
     # gsheet_id = '1j_8tC9q9--6oXxmnNt1CkimBaNunaLl-p2UzrFrb2hk'  # Single page
-    # sheet_name = '26.10.2020'
+    sheet_name = '21.12.2020'
 
     list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
     gsheet_name = get_gsheet_name(gsheet_id=gsheet_id)
@@ -296,7 +296,7 @@ if __name__ == "__main__":
     # crawl_artist_image_albumpage()
 
 
-    # update_wiki_singlepage()
+    update_wiki_singlepage()
     # update_wiki_albumpage()
 
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))

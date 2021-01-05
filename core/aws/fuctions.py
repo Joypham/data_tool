@@ -1,6 +1,6 @@
 from core.aws.aws_config import AWSConfig
 from core.aws.s3.aws_s3 import existing_on_s3
-from core.crud.sql.datasource import get_all_by_ids, get_all_datasource_valid, related_datasourceid
+from core.crud.sql.datasource import get_all_datasource_by_ids, get_all_datasource_valid, related_datasourceid
 from core.crud.sql.track import get_all_by_track_ids
 from core.models.data_source_format_master import DataSourceFormatMaster
 from core.crud.get_df_from_query import get_df_from_query
@@ -11,7 +11,7 @@ from core import query_path
 
 def checking_lost_datasource_filename_from_S3(datasource_ids: list):
     print("start checking datasource filename")
-    db_datasources = get_all_by_ids(datasource_ids)
+    db_datasources = get_all_datasource_by_ids(datasource_ids)
 
     for db_datasource in db_datasources:
         if db_datasource.is_video == 1:
@@ -26,7 +26,7 @@ def checking_lost_datasource_filename_from_S3(datasource_ids: list):
 
 def checking_lost_datasource_image_from_S3(datasource_ids: list):
     print("start checking datasource image")
-    db_datasources = get_all_by_ids(datasource_ids)
+    db_datasources = get_all_datasource_by_ids(datasource_ids)
     for db_datasource in db_datasources:
         resize_images = db_datasource.ext.get('resize_images')
         for resize_image in resize_images:
@@ -41,7 +41,7 @@ def checking_lost_datasource_image_from_S3(datasource_ids: list):
 
 def checking_lost_datasource_background_from_S3(datasource_ids: list):
     print("\nstart checking background")
-    db_datasources = get_all_by_ids(datasource_ids)
+    db_datasources = get_all_datasource_by_ids(datasource_ids)
     for db_datasource in db_datasources:
         if db_datasource.format_id in ("74BA994CF2B54C40946EA62C3979DDA3", "7F8B6CD82F28437888BD029EFDA1E57F"):
             try:
@@ -62,7 +62,7 @@ def checking_lost_datasource_background_from_S3(datasource_ids: list):
 
 def checking_lost_pip_from_S3(datasource_ids: list):
     print("\nstart checking pip")
-    db_datasources = get_all_by_ids(datasource_ids)
+    db_datasources = get_all_datasource_by_ids(datasource_ids)
     for db_datasource in db_datasources:
         print()
         if db_datasource.format_id == "1A67A5F1E0D84FB9B48234AE65086375":

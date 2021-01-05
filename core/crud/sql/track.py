@@ -41,18 +41,28 @@ def get_all_by_track_ids(trackids: list):
         Track.created_at.desc()).all()
 
 
-def get_one_by_id(track_id: str):
-    return db_session.query(Track).filter((Track.valid == 1),
-                                          Track.id == track_id).all()[0]
+def get_one_track_by_id(track_id: str):
+    db_track =  db_session.query(Track).filter((Track.valid == 1),
+                                          Track.id == track_id).all()
+    if not db_track:
+        return db_track
+    else:
+        return db_track[0]
 
 
 if __name__ == "__main__":
     # k = get_compiled_raw_mysql(get_one_by_ids('1D379486D15C4D748056B3DE0D9D6249'))
     # print(k)
 
-    trackid = '4DA767501B9C4180AE8D541B51B59C3A'
-    db_track = get_one_by_id(trackid)
-    print(db_track.title)
+    trackid = 'joy'
+    db_track = get_one_track_by_id(trackid)
+    if not db_track:
+        print("joy xinh")
+    else:
+        print(db_track.title)
+
+
+        # print(db_track.title)
 
     # print(db_track.title)
 

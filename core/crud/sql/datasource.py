@@ -60,10 +60,22 @@ def get_all_datasource_valid() -> List[DataSource]:
         DataSource.created_at.desc()).all()
 
 
-def get_all_by_ids(datasourceids: list):
+def get_all_datasource_by_ids(datasourceids: list):
+    # Nho update lai sau khi chay xong lost S3 datasource
     return db_session.query(DataSource).filter((DataSource.valid == 1),
                                                DataSource.id.in_(datasourceids)).order_by(
-        DataSource.created_at.desc()).all()
+        DataSource.updated_at.asc()).all()
+
+
+def get_one_datasource_by_id(datasourceid: str):
+    # Nho update lai sau khi chay xong lost S3 datasource
+    db_datasource = db_session.query(DataSource).filter((DataSource.valid == 1),
+                                               DataSource.id == datasourceid).order_by(
+        DataSource.updated_at.asc()).all()
+    if not db_datasource:
+        return db_datasource
+    else:
+        return db_datasource[0]
 
 
 def get_youtube_info_from_trackid(track_ids: list, format_id):
@@ -101,7 +113,8 @@ def get_one_youtube_url_and_youtube_uploader_by_youtube_url(youtube_url: str):
     return db_session.query(DataSource).filter((DataSource.valid == 1),
                                                func.json_extract(DataSource.info, "$.source.uploader") != None,
                                                func.json_extract(DataSource.info, "$.source.title") != None,
-                                               DataSource.source_uri == youtube_url
+                                               DataSource.source_uri == youtube_url,
+                                               func.json_extract(DataSource.info, "$.source.title") != "_",
                                                ).order_by(
         DataSource.created_at.desc()).limit(1).all()
 
@@ -115,8 +128,10 @@ def get_list_datasourceid():
 
 
 if __name__ == "__main__":
-    # track_ids = ["C865654002BC42DDBF0B44F4D8A1C16D"]
-    url = 'https://www.youtube.com/watch?v=RGiKQaiaVHE'
+    track_ids = ["BDC6FC7C034446D993455E49B7F6C991"]
+
+
+    # url = 'https://www.youtube.com/watch?v=RGiKQaiaVHE'
     # format_id = DataSourceFormatMaster.FORMAT_ID_MP3_FULL
-    joy = get_compiled_raw_mysql(get_one_youtube_url_and_youtube_uploader_by_youtube_url(url))
+    # joy = get_compiled_raw_mysql(get_one_youtube_url_and_youtube_uploader_by_youtube_url(url))
     print(joy)

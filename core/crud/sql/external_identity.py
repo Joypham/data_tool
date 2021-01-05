@@ -42,7 +42,7 @@ def get_artists_from_album_ituneid(album_ituneid: list):
     return artists_from_album_ituneid
 
 
-def get_trackid_from_ituneid_and_tracknum(album_ituneid: list,track_num: list ):
+def get_trackid_from_ituneid_and_tracknum(album_ituneid: list, track_num: list ):
     trackid_from_ituneid_and_tracknum = (db_session.query(ExternalIdentity.external_id.label('ituneid'),
                                                           ItunesRelease.track_seq.label('tracknum'),
                                                           Track.id.label('track_id'),

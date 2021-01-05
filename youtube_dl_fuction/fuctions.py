@@ -38,37 +38,30 @@ def get_raw_title_uploader_from_youtube_url(youtube_url: str):
 
 def get_youtube_title_and_youtube_uploader_from_youtube_url(youtube_url: str):
     db_datasources = get_one_youtube_url_and_youtube_uploader_by_youtube_url(youtube_url)
+
     if not db_datasources:
         youtube_info_result = get_raw_title_uploader_from_youtube_url(youtube_url)
     else:
+
         for db_datasource in db_datasources:
             info = db_datasource.info.get('source', None)
             youtube_title = info.get('title', None)
             uploader = info.get('uploader', None)
             youtube_info_result = {"youtube_url": youtube_url, "uploader": uploader,
                                    "youtube_title": youtube_title}
+    print(youtube_info_result)
     return youtube_info_result
 
 
 if __name__ == "__main__":
     start_time = time.time()
     youtube_urls = [
-        "https://www.youtube.com/watch?v=OQpWoPi3H28",
-        "https://www.youtube.com/watch?v=uWM9vJad7hY",
-        "https://www.youtube.com/watch?v=UkCqIpWoRcY",
-        "https://www.youtube.com/watch?v=nCvXtx9QPd8",
-        "https://www.youtube.com/watch?v=HyZnq44kVBQ",
-        "https://www.youtube.com/watch?v=psZ1g9fMfeo",
-        "https://www.youtube.com/watch?v=xIEhVH7wQw4",
-        "https://www.youtube.com/watch?v=NPUgrtEWs0Y"
-
-
+        "https://www.youtube.com/watch?v=3tb-TQNeocY"
     ]
     for youtube_url in youtube_urls:
         print(youtube_url)
         get_youtube_title_and_youtube_uploader_from_youtube_url(youtube_url)
         # get_raw_title_uploader_from_youtube_url(youtube_url)
-
     t2 = time.time() - start_time
     print(t2)
 

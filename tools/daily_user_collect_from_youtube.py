@@ -4,9 +4,11 @@ from datetime import date
 from youtube_dl_fuction.fuctions import get_raw_title_uploader_from_youtube_url
 import time
 import pandas as pd
+import re, datetime
 from numpy import random
 
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
+from google_spreadsheet_api.function import get_list_of_sheet_title
 
 
 def daily_user_collect_from_youtube():
@@ -57,8 +59,6 @@ def daily_user_collect_from_youtube():
     df['get_youtube_uploader'] = se_youtube_uploader.values
     print(df)
 
-
-
     # print("\n", "Get data result \n", df)
     # STEP 2: Create sheet and update data to sheet
     creat_new_sheet_and_update_data_from_df(df, gsheet_id, new_title)
@@ -66,5 +66,14 @@ def daily_user_collect_from_youtube():
     print("\n --- %s seconds ---" % (time.time() - start_time1))
 
 
+def get_date_from_str(str: str):
+    match = re.search('\d{4}-\d{2}-\d{2}', str)
+    date = datetime.datetime.strptime(match.group(), '%Y-%m-%d').date()
+
+
 if __name__ == "__main__":
-    daily_user_collect_from_youtube()
+    # daily_user_collect_from_youtube()
+    str = "I have a meeting on 2018-12-10 in New York"
+    get_date_from_str(str)
+
+
