@@ -110,35 +110,46 @@ def proccess_file_name_lost_from_S3(datasource_ids: list):
         print(f"Datasource id: [{db_datasource.id}] - {result}")
 
         # Step 2: get datasource lost from S3
-        with open('/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/datasource_id', "a+") as f1:
-            if result == 0:
-                joy_xinh_qua = f"{db_datasource.track_id} -------{db_datasource.id}-------{db_datasource.format_id}-------{db_datasource.source_uri};\n"
-                f1.write(joy_xinh_qua)
-        # Step 3: to fix datasource lost from S3
-        with open(query_path, "a+") as f2:
-            db_track = get_one_track_by_id(db_datasource.track_id)
-            if not db_track or db_datasource.track_id == '':
-                joy_xinh = f"--trackid not existed track_valid {db_datasource.track_id}"
-                f2.write(joy_xinh)
-            else:
-                if result == 0 and db_datasource.format_id in (
-                        DataSourceFormatMaster.FORMAT_ID_MP3_FULL, DataSourceFormatMaster.FORMAT_ID_MP4_FULL,
-                        DataSourceFormatMaster.FORMAT_ID_MP4_STATIC):
-                    joy_xinh = crawl_youtube(track_id=db_track.id, youtube_url=db_datasource.source_uri,
-                                             format_id=db_datasource.format_id, when_exist=WhenExist.REPLACE,
-                                             pic=f"{gsheet_name}_{sheet_name}", priority=1999)
-                    f2.write(joy_xinh)
-                elif result == 0 and db_datasource.format_id == DataSourceFormatMaster.FORMAT_ID_MP4_LIVE:
-                    vibbidi_title = db_datasource.info.get('vibbidi_title')
-                    track_title = db_track.title
-                    live_info = get_split_info(vibbidi_title=vibbidi_title, track_title=track_title)
-                    joy_xinh = crawl_youtube(track_id=db_track.id, youtube_url=db_datasource.source_uri,
-                                             format_id=db_datasource.format_id, when_exist=WhenExist.REPLACE,
-                                             place=live_info.get('concert_live_name'), year=live_info.get('year'),
-                                             priority=1999)
-                    f2.write(joy_xinh)
+        if result == 0:
+            with open('/Users/phamhanh/PycharmProjects/data_operation_fixed1/sources/datasource_id', "a+") as f1:
+                if db_datasource.track_id == '':
+                        joy_xinh_qua = f"datasource not have trackid-------{db_datasource.id}-------{db_datasource.format_id}-------{db_datasource.source_uri};\n"
+                        f1.write(joy_xinh_qua)
                 else:
-                    continue
+                    db_track = get_one_track_by_id(db_datasource.track_id)
+                    if not db_track:
+                        joy_xinh_qua = f"not existed track_valid-------{db_datasource.id}-------{db_datasource.format_id}-------{db_datasource.source_uri};\n"
+                        f1.write(joy_xinh_qua)
+                    else:
+                        joy_xinh_qua = f"{db_track.id}-------{db_datasource.id}-------{db_datasource.format_id}-------{db_datasource.source_uri};\n"
+                        f1.write(joy_xinh_qua)
+
+        # Step 3: to fix datasource lost from S3
+                        with open(query_path, "a+") as f2:
+                            if db_datasource.format_id in (
+                                    DataSourceFormatMaster.FORMAT_ID_MP3_FULL,
+                                    DataSourceFormatMaster.FORMAT_ID_MP4_FULL,
+                                    DataSourceFormatMaster.FORMAT_ID_MP4_STATIC,
+                                    DataSourceFormatMaster.FORMAT_ID_MP4_LYRIC):
+                                joy_xinh = crawl_youtube(track_id=db_track.id, youtube_url=db_datasource.source_uri,
+                                                         format_id=db_datasource.format_id,
+                                                         when_exist=WhenExist.REPLACE,
+                                                         pic=f"{gsheet_name}_{sheet_name}", priority=1999)
+                                f2.write(joy_xinh)
+                            elif result == 0 and db_datasource.format_id == DataSourceFormatMaster.FORMAT_ID_MP4_LIVE:
+                                vibbidi_title = db_datasource.info.get('vibbidi_title')
+                                track_title = db_track.title
+                                live_info = get_split_info(vibbidi_title=vibbidi_title, track_title=track_title)
+                                joy_xinh = crawl_youtube(track_id=db_track.id, youtube_url=db_datasource.source_uri,
+                                                         format_id=db_datasource.format_id,
+                                                         when_exist=WhenExist.REPLACE,
+                                                         place=live_info.get('concert_live_name'),
+                                                         year=live_info.get('year'),
+                                                         pic=f"{gsheet_name}_{sheet_name}",
+                                                         priority=1999)
+                                f2.write(joy_xinh)
+                            else:
+                                continue
 
 
 if __name__ == "__main__":
@@ -146,7 +157,7 @@ if __name__ == "__main__":
     start_time = time.time()
     gsheetid = '1Qu5oUocflDr4ERJvux8eSnuVVIGp1-WNzjqE7NeYKJI'
     gsheet_name = get_gsheet_name(gsheet_id=gsheetid)
-    sheet_name = 'total lost'
+    sheet_name = 'Sheet4'
     df = get_df_from_speadsheet(gsheet_id=gsheetid, sheet_name=sheet_name)
     list_dsid = list(dict.fromkeys(df['datasourceid'].values.tolist()))
     proccess_file_name_lost_from_S3(list_dsid)

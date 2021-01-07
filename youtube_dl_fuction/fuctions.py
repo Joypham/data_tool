@@ -8,6 +8,26 @@ from numpy import random
 import traceback
 
 
+def get_raw_youtube_info(youtube_url: str):
+    ytdl_options = {
+        # "cachedir": False,
+        "quiet": True,
+        "nocheckcertificate": True,
+        "restrictfilenames": True,
+        "cookiefile": youtube_com_cookies_path,
+    }
+
+    ydl = youtube_dl.YoutubeDL(ytdl_options)
+
+    result = ydl.extract_info(
+        youtube_url,
+        download=False  # We just want to extract the info
+    )
+    joy = json.dumps(result)
+    print(joy)
+    return joy
+
+
 def get_raw_title_uploader_from_youtube_url(youtube_url: str):
     ytdl_options = {
         # "cachedir": False,
@@ -25,14 +45,15 @@ def get_raw_title_uploader_from_youtube_url(youtube_url: str):
             download=False  # We just want to extract the info
         )
         youtube_info_result = {"youtube_url": youtube_url, "uploader": result.get('uploader'),
-                               "youtube_title": result.get('title')}
+                               "youtube_title": result.get('title'), "duration": result.get('duration')}
     except DownloadError as ex:
-        youtube_info_result = {"youtube_url": youtube_url, "uploader": f"{ex}", "youtube_title": f"{ex}"}
+        youtube_info_result = {"youtube_url": youtube_url, "uploader": f"{ex}", "youtube_title": f"{ex}", "duration": f"{ex}"}
     except:  # noqa
         youtube_info_result = {"youtube_url": youtube_url, "uploader": "Error: Unknown error",
-                               "youtube_title": "Error: Unknown error"}
+                               "youtube_title": "Error: Unknown error", "duration": "Error: Unknown error"}
     x = random.uniform(0.5, 3)
     time.sleep(x)
+    # print(youtube_info_result)
     return youtube_info_result
 
 
@@ -60,8 +81,8 @@ if __name__ == "__main__":
     ]
     for youtube_url in youtube_urls:
         print(youtube_url)
-        get_youtube_title_and_youtube_uploader_from_youtube_url(youtube_url)
-        # get_raw_title_uploader_from_youtube_url(youtube_url)
+        # get_youtube_title_and_youtube_uploader_from_youtube_url(youtube_url)
+        get_raw_title_uploader_from_youtube_url(youtube_url)
     t2 = time.time() - start_time
     print(t2)
 
