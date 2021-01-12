@@ -29,19 +29,24 @@ def get_video_image(url: str):
 
 
 def get_video_duration(url: str):
-    cap = cv2.VideoCapture(url)
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    duration = int(round(frame_count / fps, 0)) * 1000
-    print(duration)
-    return duration
+    try:
+        cap = cv2.VideoCapture(url)
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        duration = int(round(frame_count / fps, 0)) * 1000
+        print(duration)
+        return duration
+    except ZeroDivisionError:
+        print("cant get duration")
 
 
 if __name__ == "__main__":
     start_time = time.time()
     urls = [
         "https://s3.amazonaws.com/vibbidi-us/audio/audio_D8A1B62092494DE7B2FFC01DF80C5A64.mp3",
-        "https://s3.amazonaws.com/vibbidi-us/videos/video_EFD70D27F348412C87EE942E1700448A.mp4"
+        "https://s3.amazonaws.com/vibbidi-us/videos/video_EFD70D27F348412C87EE942E1700448A.mp4",
+        "https://s3.amazonaws.com/vibbidi-us/audio/audio_BBD90B838A204A4DA0C680A6DA4B4DF5.mp3",
+        "https://s3.amazonaws.com/vibbidi-us/audio/audio_C06F9034DB624DDCB7CF49858192B36F.mp3"
     ]
     for url in urls:
         # k = get_video_decode(url)
