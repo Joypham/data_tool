@@ -22,7 +22,7 @@ def get_split_info(vibbidi_title: str, track_title: str):
     return {"year": year, "concert_live_name": concert_live_name}
 
 
-def checking_lost_datasource_from_S3_fix(datasource_id: str):
+def checking_lost_filename_datasource_from_S3(datasource_id: str):
     db_datasource = get_one_datasource_by_id(datasource_id)
 
     if "berserker" in db_datasource.cdn:
@@ -129,6 +129,17 @@ def checking_lost_datasource_resize_image_from_S3(datasource_id: str):
         print(result)
 
 
+def checking_fault_datasource_image(datasource_id: str):
+    db_datasource = get_one_datasource_by_id(datasource_id)
+    if "berserker" in db_datasource.cdn:
+        key = f"videos/{db_datasource.file_name}.jpg"
+    else:
+        key = f"audio/{db_datasource.file_name}.jpg"
+    result = existing_on_s3(key)
+    print(f"{key}---{AWSConfig.S3_DEFAULT_BUCKET}")
+    print(f"Datasource id: [{db_datasource.id}] - {result}")
+    return result
+
 if __name__ == "__main__":
     # https://docs.google.com/spreadsheets/d/1Qu5oUocflDr4ERJvux8eSnuVVIGp1-WNzjqE7NeYKJI/edit#gid=709402142
 
@@ -139,8 +150,9 @@ if __name__ == "__main__":
     df = get_df_from_speadsheet(gsheet_id=gsheetid, sheet_name=sheet_name)
     list_dsid = list(dict.fromkeys(df['datasourceid'].values.tolist()))
     for dsid in list_dsid:
-        print(dsid + "\n")
-        checking_lost_datasource_resize_image_from_S3(dsid)
+        # print(dsid + "\n")
+        # checking_lost_datasource_resize_image_from_S3(dsid)
+        checking_fault_datasource_image(dsid)
     # proccess_file_name_lost_from_S3(list_dsid)
     # list_dsid = [
     #     "F3ED1BFEB02E451188351CF0802429E7",

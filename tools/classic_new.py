@@ -27,11 +27,12 @@ def similarity():
     row_index = df.index
     list = []
     for i in row_index:
-        youtube_url = df['Mp3_link'].loc[i]
+        youtube_url = df['url_to_add'].loc[i]
         track_title = df['Song Title on Itunes'].loc[i].lower()
         get_youtube_info = get_youtube_title_and_youtube_uploader_from_youtube_url(youtube_url)
         get_youtube_title = get_youtube_info['youtube_title'].lower()
         get_youtube_uploader = get_youtube_info['uploader'].lower()
+        get_youtube_duration = get_youtube_info['duration']
         print(f"{track_title}----{get_youtube_title}")
 
         result = "type 3"
@@ -59,29 +60,30 @@ def similarity():
 
         print(f"{token_set_ratio}-----{result}-----{special_character}-----{track_title}-----{get_youtube_title}")
 
-        list.extend([get_youtube_title, get_youtube_uploader, token_set_ratio])
+        list.extend([get_youtube_title, get_youtube_uploader, get_youtube_duration, token_set_ratio])
 
-    data_frame = pd.DataFrame(np.array(list).reshape(-1, 3),
-                              columns=["youtube_title", "youtube_uploader", "token_set_ratio"])
+    data_frame = pd.DataFrame(np.array(list).reshape(-1, 4),
+                              columns=["youtube_title", "youtube_uploader", "duration", "token_set_ratio"])
 
     print(data_frame)
     updated_df = data_frame
-    print(updated_df)
-    column_name = ["youtube_title", "youtube_uploader", "token_set_ratio"]
-    list_result = updated_df.values.tolist()  # transfer data_frame to 2D list
-    list_result.insert(0, column_name)
-    range_to_update = f"{sheet_name}!N1"
-    update_value(list_result, range_to_update, gsheet_id)  # validate_value type: object, int, category... NOT DATETIME
+    # print(updated_df)
+    # column_name = ["youtube_title", "youtube_uploader", "token_set_ratio"]
+    # list_result = updated_df.values.tolist()  # transfer data_frame to 2D list
+    # list_result.insert(0, column_name)
+    # range_to_update = f"{sheet_name}!J1"
+    # update_value(list_result, range_to_update, gsheet_id)  # validate_value type: object, int, category... NOT DATETIME
 
 
 if __name__ == "__main__":
+    # https://docs.google.com/spreadsheets/d/1aRhZ7NQAfhud3jjR5aboCZ3Ew8u2Y0SqGqUQYwcUnBs/edit#gid=98817891
     start_time = time.time()
     pd.set_option("display.max_rows", None, "display.max_columns", 50, 'display.width', 1000)
-    gsheet_id = '1cm-jByGw8YLUxOXFS4DLdqSAi6ObAHEy6XxZVVBCsgE'
+    gsheet_id = '1aRhZ7NQAfhud3jjR5aboCZ3Ew8u2Y0SqGqUQYwcUnBs'
     gsheet_name = get_gsheet_name(gsheet_id=gsheet_id)
-    sheet_name = '0-100'
+    sheet_name = 'MP_3'
     df = get_df_from_speadsheet(gsheet_id=gsheet_id, sheet_name= sheet_name)
-    df = df.head(500)
+    df = df.head(10)
     similarity()
 
     # print(k)

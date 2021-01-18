@@ -45,7 +45,7 @@ def get_raw_title_uploader_from_youtube_url(youtube_url: str):
             download=False  # We just want to extract the info
         )
         youtube_info_result = {"youtube_url": youtube_url, "uploader": result.get('uploader'),
-                               "youtube_title": result.get('title'), "duration": result.get('duration')}
+                               "youtube_title": result.get('title'), "duration": result.get('duration') * 1000}
     except DownloadError as ex:
         youtube_info_result = {"youtube_url": youtube_url, "uploader": f"{ex}", "youtube_title": f"{ex}", "duration": f"{ex}"}
     except:  # noqa
@@ -68,8 +68,9 @@ def get_youtube_title_and_youtube_uploader_from_youtube_url(youtube_url: str):
             info = db_datasource.info.get('source', None)
             youtube_title = info.get('title', None)
             uploader = info.get('uploader', None)
+            duration = db_datasource.duration_ms
             youtube_info_result = {"youtube_url": youtube_url, "uploader": uploader,
-                                   "youtube_title": youtube_title}
+                                   "youtube_title": youtube_title, "duration": duration}
     print(youtube_info_result)
     return youtube_info_result
 
@@ -82,7 +83,8 @@ if __name__ == "__main__":
     for youtube_url in youtube_urls:
         print(youtube_url)
         # get_youtube_title_and_youtube_uploader_from_youtube_url(youtube_url)
-        get_raw_title_uploader_from_youtube_url(youtube_url)
+        joy = get_raw_title_uploader_from_youtube_url(youtube_url)
+        print(joy)
     t2 = time.time() - start_time
     print(t2)
 
