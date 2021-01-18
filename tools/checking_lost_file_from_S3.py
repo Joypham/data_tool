@@ -22,7 +22,7 @@ def get_split_info(vibbidi_title: str, track_title: str):
     return {"year": year, "concert_live_name": concert_live_name}
 
 
-def checking_lost_datasource_from_S3_fix(datasource_id: str):
+def checking_lost_datasource_from_S3(datasource_id: str):
     db_datasource = get_one_datasource_by_id(datasource_id)
 
     if "berserker" in db_datasource.cdn:
@@ -91,42 +91,52 @@ def proccess_file_name_lost_from_S3(datasource_ids: list):
                                 continue
 
 
-def checking_lost_datasource_resize_image_from_S3(datasource_id: str):
-    db_datasource = get_one_datasource_by_id(datasource_id)
+def checking_lost_datasource_resize_image_from_S3(db_datasource: object):
     ext_keys = db_datasource.ext.keys()
-    resize_image_types = ["micro", "tiny", "small", "medium", "large", "extra"]
+    expect_resize_image_types = ["micro", "tiny", "small", "medium", "large", "extra"]
     result = ""
     with open(query_path, "a+") as f:
         if "resize_images" in ext_keys:
-            for resize_image_type in resize_image_types:
-                existed_resize_images = db_datasource.ext.get('resize_images')
+            for expect_resize_image_type in expect_resize_image_types:
+                actual_resize_images = db_datasource.ext.get('resize_images')
                 loop = False
                 joy_xinh = ""
-                for existed_resize_image in existed_resize_images:
+                for existed_resize_image in actual_resize_images:
                     existed_resize_image_type = existed_resize_image.split(".")[-2]
-                    if existed_resize_image_type == resize_image_type:
+                    if existed_resize_image_type == expect_resize_image_type:
                         loop = True
                         if "video" in existed_resize_image:
                             key = f"videos/{existed_resize_image}"
                         else:
                             key = f"audio/{existed_resize_image}"
-                        existed_S3_resize_image = existing_on_s3(key, bucket=AWSConfig.S3_DEFAULT_BUCKET)
-                        joy_xinh = joy_xinh + f"{db_datasource.id}, {resize_image_type}, {existed_S3_resize_image}, {key}, {db_datasource.source_uri}\n"
-                        if not existed_S3_resize_image:
+                        checking_exist_file_on_S3 = existing_on_s3(key, bucket=AWSConfig.S3_DEFAULT_BUCKET)
+                        joy_xinh = joy_xinh + f"{db_datasource.id}, {expect_resize_image_type}, {checking_exist_file_on_S3}, {key}, {db_datasource.source_uri}\n"
+                        if not checking_exist_file_on_S3:
                             f.write(joy_xinh)
                         break
                     else:
                         continue
                 result = result + joy_xinh
                 if not loop:
-                    joy_xinh = joy_xinh + f"{db_datasource.id}, {resize_image_type}, not have, not have, not have\n"
-                    result = result + f"{db_datasource.id}, {resize_image_type}, not have, not have, not have\n"
+                    joy_xinh = joy_xinh + f"{db_datasource.id}, {expect_resize_image_type}, not have, not have, not have\n"
+                    result = result + f"{db_datasource.id}, {expect_resize_image_type}, not have, not have, not have\n"
                     f.write(joy_xinh)
         else:
             result = result + f"{db_datasource.id}, not have, not have, not have, not have\n"
-            joy_xinh =f"{db_datasource.id}, not have, not have, not have, not have\n"
+            joy_xinh = f"{db_datasource.id}, not have, not have, not have, not have\n"
             f.write(joy_xinh)
         print(result)
+
+
+def checking_lost_datasource_default_image_from_S3(db_datasource: object):
+
+    if "berserker" in db_datasource.cdn:
+        key = f"videos/{db_datasource.file_name}"
+    else:
+        key = f"audio/{db_datasource.file_name}"
+    result = existing_on_s3(key)
+    print(f"{key}---{AWSConfig.S3_DEFAULT_BUCKET}")
+    print(f"Datasource id: [{db_datasource.id}] - {result}")
 
 
 if __name__ == "__main__":
@@ -140,7 +150,9 @@ if __name__ == "__main__":
     list_dsid = list(dict.fromkeys(df['datasourceid'].values.tolist()))
     for dsid in list_dsid:
         print(dsid + "\n")
-        checking_lost_datasource_resize_image_from_S3(dsid)
+        db_datasource = get_one_datasource_by_id(dsid)
+        # checking_lost_datasource_resize_image_from_S3(db_datasource)
+        checking_lost_datasource_default_image_from_S3(db_datasource=db_datasource)
     # proccess_file_name_lost_from_S3(list_dsid)
     # list_dsid = [
     #     "F3ED1BFEB02E451188351CF0802429E7",

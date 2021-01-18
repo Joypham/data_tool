@@ -5,7 +5,7 @@ from core.crud.sql.datasource import get_all_datasource_by_ids, get_one_datasour
 from core.crud.sql.track import get_one_track_by_id
 from google_spreadsheet_api.function import get_df_from_speadsheet, get_gsheet_name
 from open_cv_function.openCV_simple import get_video_duration
-from tools.checking_lost_file_from_S3 import checking_lost_datasource_from_S3_fix
+from tools.checking_lost_file_from_S3 import checking_lost_datasource_from_S3
 
 from core.models.data_source_format_master import DataSourceFormatMaster
 from core import query_path
@@ -23,7 +23,7 @@ def update_datasource_duration(datasource_ids: list):
             s3_filename_url = "https://s3.amazonaws.com/vibbidi-us/audio/" + db_datasource.file_name
         print(s3_filename_url)
         # step 2 get datasource duration
-        result = checking_lost_datasource_from_S3_fix(db_datasource.id)
+        result = checking_lost_datasource_from_S3(db_datasource.id)
         if not result:
             print(f"datasource_id: {db_datasource.id} lost filename from S3")
         else:

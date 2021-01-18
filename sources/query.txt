@@ -1,3 +1,4 @@
+datasource_id, expected_child_type, actual_child_type, S3_key, youtube_url
 9FDC79CED3A74606B60A2E147E4E6F38, micro, not have, not have, not have
 9FDC79CED3A74606B60A2E147E4E6F38, tiny, not have, not have, not have
 9FDC79CED3A74606B60A2E147E4E6F38, small, not have, not have, not have
@@ -474,3 +475,10 @@ EA472109F3D843EBBC196EE2A6EF2A57, extra, not have, not have, not have
 9AC2DEC4FB36499D8075737378A1DCD7, medium, not have, not have, not have
 9AC2DEC4FB36499D8075737378A1DCD7, large, not have, not have, not have
 9AC2DEC4FB36499D8075737378A1DCD7, extra, not have, not have, not have
+6642E332051848FF9F29E6F2B1556C0D, micro, not have, not have, not have
+DBCA30A636744E77A413E5AEDC136DF5, micro, not have, not have, not have
+DBCA30A636744E77A413E5AEDC136DF5, tiny, not have, not have, not have
+DBCA30A636744E77A413E5AEDC136DF5, small, not have, not have, not have
+DBCA30A636744E77A413E5AEDC136DF5, medium, not have, not have, not have
+DBCA30A636744E77A413E5AEDC136DF5, large, not have, not have, not have
+DBCA30A636744E77A413E5AEDC136DF5, extra, not have, not have, not have
