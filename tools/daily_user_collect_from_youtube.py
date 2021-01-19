@@ -29,7 +29,6 @@ def daily_user_collect_from_youtube():
     df['contribution_url'] = df['contribution_url'].apply(lambda x: x.replace('"', ""))
     # df = df.head(100)
 
-
     row_index = df.index
     get_youtube_titles = []
     get_youtube_uploaders = []
@@ -72,8 +71,8 @@ def get_date_from_str(str: str):
 
 
 if __name__ == "__main__":
-    # daily_user_collect_from_youtube()
-    str = "I have a meeting on 2018-12-10 in New York"
-    get_date_from_str(str)
+    daily_user_collect_from_youtube()
+    # str = "I have a meeting on 2018-12-10 in New York"
+    # get_date_from_str(str)
 
 
