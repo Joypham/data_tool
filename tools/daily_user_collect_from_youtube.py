@@ -1,14 +1,20 @@
 from core.crud.sql.pointlog import collect_from_youtube_query
 from core.crud.get_df_from_query import get_df_from_query
-from datetime import date
+from datetime import date, timedelta
 from youtube_dl_fuction.fuctions import get_raw_title_uploader_from_youtube_url
+from google_spreadsheet_api.function import get_list_of_sheet_title, delete_sheet
 import time
 import pandas as pd
 import re, datetime
 from numpy import random
 
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
-from google_spreadsheet_api.function import get_list_of_sheet_title
+
+
+def get_date_from_str(str: str):
+    match = re.search('\d{4}-\d{2}-\d{2}', str)
+    date = datetime.datetime.strptime(match.group(), '%Y-%m-%d').date()
+    return date
 
 
 def daily_user_collect_from_youtube():
@@ -28,7 +34,6 @@ def daily_user_collect_from_youtube():
     df = df.fillna(value='None').astype({"created_at": 'str'})
     df['contribution_url'] = df['contribution_url'].apply(lambda x: x.replace('"', ""))
     # df = df.head(100)
-
     row_index = df.index
     get_youtube_titles = []
     get_youtube_uploaders = []
@@ -64,16 +69,25 @@ def daily_user_collect_from_youtube():
 
     print("\n --- %s seconds ---" % (time.time() - start_time1))
 
+    # STEP 3: delete sheet_name > 7 days ago:
+    for sheet_name in get_list_of_sheet_title(gsheet_id=gsheet_id):
+        sheet_date = get_date_from_str(sheet_name)
+        if sheet_date > date.today() - timedelta(days=9):
+            print(f"Keep sheet_name: {sheet_name}: {sheet_date}")
 
-def get_date_from_str(str: str):
-    match = re.search('\d{4}-\d{2}-\d{2}', str)
-    date = datetime.datetime.strptime(match.group(), '%Y-%m-%d').date()
+        else:
+            print(f"delete sheet_name: {sheet_name}: {sheet_date}")
+            delete_sheet(gsheet_id=gsheet_id, sheet_name=sheet_name)
 
 
 if __name__ == "__main__":
     daily_user_collect_from_youtube()
     # str = "I have a meeting on 2018-12-10 in New York"
-    # get_date_from_str(str)
+    # k = get_date_from_str(str)
+    # print(k)
+
+
+
+
+
     # joy xinh
-
-

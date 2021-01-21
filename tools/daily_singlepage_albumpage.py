@@ -277,12 +277,12 @@ if __name__ == "__main__":
     # INPUT HERE:
     # Input_url 'https://docs.google.com/spreadsheets/d/1S2HD6IL_QdgFNgdm3811JBY3pX9UE2Oa36C_tulpJBw/edit#gid=2066669079'
 
-    gsheet_id = '1S2HD6IL_QdgFNgdm3811JBY3pX9UE2Oa36C_tulpJBw'  # Album page
-    sheet_name = '21.12.2020'
+    gsheet_id = '1WADyMyS9Bcbgxcr2aZpIiBg_3MNAA4LbpakUUsjRGOc'  # Album page
+    sheet_name = '11.01.2021'
 
     # Input_url 'https://docs.google.com/spreadsheets/d/1j_8tC9q9--6oXxmnNt1CkimBaNunaLl-p2UzrFrb2hk/edit#gid=737499827'
-    # gsheet_id = '1j_8tC9q9--6oXxmnNt1CkimBaNunaLl-p2UzrFrb2hk'  # Single page
-    sheet_name = '21.12.2020'
+    # gsheet_id = '1Hfeo1IjJ9FuW6v7LQxrC1eZ7lI-BFVPg308JwKu0XY0'  # Single page
+    # sheet_name = '11.01.2021'
 
     list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
     gsheet_name = get_gsheet_name(gsheet_id=gsheet_id)
@@ -293,10 +293,11 @@ if __name__ == "__main__":
     # upload_track_lyrics()
 
     # crawl_artist_image_singlepage()
-    # crawl_artist_image_albumpage()
+    crawl_artist_image_albumpage()
 
 
-    update_wiki_singlepage()
+    # update_wiki_singlepage()
     # update_wiki_albumpage()
+
 
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))
