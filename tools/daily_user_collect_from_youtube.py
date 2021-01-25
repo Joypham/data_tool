@@ -33,7 +33,7 @@ def daily_user_collect_from_youtube():
     df = get_df_from_query(collect_from_youtube_query())
     df = df.fillna(value='None').astype({"created_at": 'str'})
     df['contribution_url'] = df['contribution_url'].apply(lambda x: x.replace('"', ""))
-    df = df.head(10)
+    # df = df.head(10)
 
     row_index = df.index
     get_youtube_titles = []
