@@ -188,39 +188,37 @@ def checking_lost_static_video_from_S3(db_datasource):
             print(joy_xinh)
             f.write(joy_xinh)
 
+def checking_lost_datasource_filename_from_S3(db_datasource: object):
+    method_name = inspect.stack()[0][3]
+    with open(query_path, "a+") as f:
+        if "berserker" in db_datasource.cdn:
+            key = f"videos/{db_datasource.file_name}"
+        else:
+            key = f"audio/{db_datasource.file_name}"
+        result = existing_on_s3(s3_key=key, bucket=AWSConfig.S3_DEFAULT_BUCKET)
+        print(f"{method_name}, {key}---{AWSConfig.S3_DEFAULT_BUCKET}----{result}")
+        if not result:
+            joy_xinh = f"{method_name}, {db_datasource.id}, None, {result}, {key}, {db_datasource.source_uri}\n"
+            f.write(joy_xinh)
+
 
 if __name__ == "__main__":
     # https://docs.google.com/spreadsheets/d/1Qu5oUocflDr4ERJvux8eSnuVVIGp1-WNzjqE7NeYKJI/edit#gid=709402142
 
     start_time = time.time()
-    # gsheetid = '1Qu5oUocflDr4ERJvux8eSnuVVIGp1-WNzjqE7NeYKJI'
-    # gsheet_name = get_gsheet_name(gsheet_id=gsheetid)
-    # sheet_name = 'checking lost resize image from S3'
-    # df = get_df_from_speadsheet(gsheet_id=gsheetid, sheet_name=sheet_name)
-    # list_dsid = list(dict.fromkeys(df['datasourceid'].values.tolist()))
-    list_dsid = [
-        "85562061DC794C7082A80838ECD00C21",
-        "F3ED1BFEB02E451188351CF0802429E7",
-        "2D578249F2C949F6AE0AA9AB20159804",
-        "B197B967140C4E22ABD7D6588F82BD14",
-        "D50B2CE3245740349418B4D1653F78A0",
-        "C8DCD912FCAE438483B4C0A610E1FC7F",
-        "8BA6954BE35E41D594F236B26038C895",
-        "A900806FAA754F5792CFB927D303CF53"
-    ]
-    for dsid in list_dsid:
-        print(dsid + "\n")
-        db_datasource = get_one_datasource_by_id(dsid)
-        # checking_lost_datasource_resize_image_from_S3(db_datasource=db_datasource)
-        # checking_lost_datasource_default_image_from_S3(db_datasource=db_datasource)
-        # checking_lost_datasource_background_from_S3(db_datasource)
-        checking_lost_static_video_from_S3(db_datasource)
+    gsheetid = '1Qu5oUocflDr4ERJvux8eSnuVVIGp1-WNzjqE7NeYKJI'
+    gsheet_name = get_gsheet_name(gsheet_id=gsheetid)
+    sheet_name = 'dsid'
+    df = get_df_from_speadsheet(gsheet_id=gsheetid, sheet_name=sheet_name)
+    list_dsid = list(dict.fromkeys(df['datasourceid'].values.tolist()))
+    db_datasources = get_all_datasource_by_ids(list_dsid)
+    for db_datasource in db_datasources:
+        print(f"{db_datasource.id}----{db_datasource.format_id}----{db_datasource.source_uri}")
+        checking_lost_datasource_filename_from_S3(db_datasource=db_datasource)
+        checking_lost_datasource_resize_image_from_S3(db_datasource=db_datasource)
+        checking_lost_datasource_default_image_from_S3(db_datasource=db_datasource)
+        checking_lost_datasource_background_from_S3(db_datasource=db_datasource)
+        checking_lost_static_video_from_S3(db_datasource=db_datasource)
     # proccess_file_name_lost_from_S3(list_dsid)
-    # list_dsid = [
-    #     "F3ED1BFEB02E451188351CF0802429E7",
-    #     "2D578249F2C949F6AE0AA9AB20159804",
-    #     "B197B967140C4E22ABD7D6588F82BD14",
-    #     "D50B2CE3245740349418B4D1653F78A0",
-    #     "C8DCD912FCAE438483B4C0A610E1FC7F"
-    # ]
+
     print("\n --- %s seconds ---" % (time.time() - start_time))
