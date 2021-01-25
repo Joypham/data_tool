@@ -2,11 +2,10 @@
 
 from core.crud.get_df_from_query import get_df_from_query
 from core.crud.sql.external_identity import get_artists_from_album_ituneid
-from google_spreadsheet_api.function import get_df_from_speadsheet, create_new_gsheet, creat_new_sheet_and_update_data_from_df
+from google_spreadsheet_api.function import get_df_from_speadsheet, create_new_gsheet, \
+    creat_new_sheet_and_update_data_from_df, update_value
 import pandas as pd
 import time
-
-new_gsheet_title = input(f"\n Input new_gsheet_title: ").strip()
 
 
 def export_artist_contribution():
@@ -19,8 +18,9 @@ def export_artist_contribution():
     result = get_df_from_query(get_artists_from_album_ituneid(album_ituneid))
 
     # Update data to gsheet_id
-    gsheet_id = create_new_gsheet(new_gsheet_title)
-    creat_new_sheet_and_update_data_from_df(result, gsheet_id, 'Artist List')
+    list_result = result[['']].values.tolist()
+    update_value(list_result=list_result, range_to_update="Accumulated User Contribution!E2",
+                 gsheet_id="1zamfPcMKhk0tDjqAStA3cfS4BYiNAIZicoQJHnERRd0")
 
 
 if __name__ == "__main__":

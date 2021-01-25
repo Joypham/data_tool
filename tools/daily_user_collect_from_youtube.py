@@ -50,7 +50,7 @@ def daily_user_collect_from_youtube():
             get_youtube_titles.append(get_youtube_title)
             get_youtube_uploaders.append(get_youtube_uploader)
 
-            x = random.uniform(0.5, 5)
+            x = random.uniform(0.5, 3)
             time.sleep(x)
 
         else:

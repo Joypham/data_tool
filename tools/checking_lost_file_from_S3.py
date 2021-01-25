@@ -150,30 +150,43 @@ def checking_lost_datasource_background_from_S3(db_datasource):
     method_name = inspect.stack()[0][3]
     with open(query_path, "a+") as f:
         datasource_ext_key = db_datasource.ext.keys()
-        if db_datasource.format_id in (DataSourceFormatMaster.FORMAT_ID_MP4_FULL, DataSourceFormatMaster.FORMAT_ID_MP4_LIVE):
-            if "bg_360_file_name" in datasource_ext_key:
-                bg_360_file_name = db_datasource.ext['bg_360_file_name']
-                bg_360_file_name_key = f"videos/{bg_360_file_name}"
-                result_bg_360_file_name = existing_on_s3(bg_360_file_name_key)
-                print(f"{method_name}, {bg_360_file_name_key}----{result_bg_360_file_name}")
-                if not result_bg_360_file_name:
-                    joy_xinh = f"{method_name}, {db_datasource.id}, bg_360_file_name, {result_bg_360_file_name}, {bg_360_file_name_key}, {db_datasource.source_uri}"
-                    f.write(joy_xinh)
-            else:
-                joy_xinh = f"{method_name}, {db_datasource.id},bg_360_file_name, not have, not have, {db_datasource.source_uri}"
+        expect_background_types = ["bg_360_file_name", "bg_720_file_name"]
+        if db_datasource.format_id in (
+        DataSourceFormatMaster.FORMAT_ID_MP4_FULL, DataSourceFormatMaster.FORMAT_ID_MP4_LIVE):
+            for expect_background_type in expect_background_types:
+                joy_xinh = ""
+                if expect_background_type in datasource_ext_key:
+                    bg_file_name_key = f"videos/{db_datasource.ext[expect_background_type]}"
+                    result_bg_file_name = existing_on_s3(bg_file_name_key)
+                    print(f"{expect_background_type}----{result_bg_file_name}----{bg_file_name_key}")
+                    if not result_bg_file_name:
+                        joy_xinh = joy_xinh + f"{method_name}, {db_datasource.id}, {expect_background_type}, {result_bg_file_name}, {bg_file_name_key}, {db_datasource.source_uri}\n"
+                else:
+                    print(f"{expect_background_type}----not have----not have")
+                    joy_xinh = joy_xinh + f"{method_name}, {db_datasource.id}, {expect_background_type}, not have, not have, {db_datasource.source_uri}\n"
+                print(joy_xinh)
                 f.write(joy_xinh)
 
-            if "bg_720_file_name" in datasource_ext_key:
-                bg_720_file_name = db_datasource.ext['bg_720_file_name']
-                bg_720_file_name_key = f"videos/{bg_720_file_name}"
-                result_bg_720_file_name = existing_on_s3(bg_720_file_name_key)
-                print(f"{method_name}, {bg_360_file_name_key}----{result_bg_720_file_name}")
-                if not result_bg_720_file_name:
-                    joy_xinh = f"{method_name}, {db_datasource.id}, bg_360_file_name, {result_bg_720_file_name}, {bg_720_file_name_key}, {db_datasource.source_uri}"
-                    f.write(joy_xinh)
+
+def checking_lost_static_video_from_S3(db_datasource):
+    method_name = inspect.stack()[0][3]
+    with open(query_path, "a+") as f:
+        if db_datasource.format_id == DataSourceFormatMaster.FORMAT_ID_MP3_FULL:
+            joy_xinh = ""
+            datasource_ext_key = db_datasource.ext.keys()
+            if 'static_video' in datasource_ext_key:
+                if 'file_name' in db_datasource.ext['static_video'].keys():
+                    key = f"videos/{db_datasource.ext['static_video']['file_name']}"
+                    result = existing_on_s3(key)
+                    print(f"{method_name}, {key}---{AWSConfig.S3_DEFAULT_BUCKET}----{result}")
+                    if not result:
+                        joy_xinh = f"{method_name}, {db_datasource.id}, None, {result}, {key}, {db_datasource.source_uri}\n"
+                else:
+                    joy_xinh = joy_xinh + f"{method_name}, {db_datasource.id}, None, not have, not have, {db_datasource.source_uri}\n"
             else:
-                joy_xinh = f"{method_name}, {db_datasource.id},bg_720_file_name, not have, not have, {db_datasource.source_uri}"
-                f.write(joy_xinh)
+                joy_xinh = joy_xinh + f"{method_name}, {db_datasource.id}, None, not have, not have, {db_datasource.source_uri}\n"
+            print(joy_xinh)
+            f.write(joy_xinh)
 
 
 if __name__ == "__main__":
@@ -186,6 +199,7 @@ if __name__ == "__main__":
     # df = get_df_from_speadsheet(gsheet_id=gsheetid, sheet_name=sheet_name)
     # list_dsid = list(dict.fromkeys(df['datasourceid'].values.tolist()))
     list_dsid = [
+        "85562061DC794C7082A80838ECD00C21",
         "F3ED1BFEB02E451188351CF0802429E7",
         "2D578249F2C949F6AE0AA9AB20159804",
         "B197B967140C4E22ABD7D6588F82BD14",
@@ -197,9 +211,10 @@ if __name__ == "__main__":
     for dsid in list_dsid:
         print(dsid + "\n")
         db_datasource = get_one_datasource_by_id(dsid)
-        checking_lost_datasource_background_from_S3(db_datasource)
         # checking_lost_datasource_resize_image_from_S3(db_datasource=db_datasource)
         # checking_lost_datasource_default_image_from_S3(db_datasource=db_datasource)
+        # checking_lost_datasource_background_from_S3(db_datasource)
+        checking_lost_static_video_from_S3(db_datasource)
     # proccess_file_name_lost_from_S3(list_dsid)
     # list_dsid = [
     #     "F3ED1BFEB02E451188351CF0802429E7",
