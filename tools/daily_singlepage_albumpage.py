@@ -2,10 +2,11 @@ import os
 from core import BASE_DIR
 from core.crud.sql.album import get_album_wiki
 from core.crud.sql.track import get_track_wiki, get_track_lyric
-from core.crud.sql.crawlingtask import get_crawl_artist_image_status, get_artist_image_cant_crawl
+from core.crud.sql.crawlingtask import get_crawl_image_status, get_artist_image_cant_crawl
 from core.crud.get_df_from_query import get_df_from_query
 
-from google_spreadsheet_api.function import  get_list_of_sheet_title, update_value, get_df_from_speadsheet, get_gsheet_name
+from google_spreadsheet_api.function import get_list_of_sheet_title, update_value, get_df_from_speadsheet, \
+    get_gsheet_name
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
 import time
@@ -66,7 +67,7 @@ def automate_check_crawl_artist_image_status():  # need to optimize
     if commit_message == '1':
         count = 0
         while True and count < 300:
-            df1 = get_df_from_query(get_crawl_artist_image_status())
+            df1 = get_df_from_query(get_crawl_image_status())
             result = df1[
                          (df1.status != 'complete')
                          & (df1.status != 'incomplete')
@@ -293,11 +294,9 @@ if __name__ == "__main__":
     # upload_track_lyrics()
 
     # crawl_artist_image_singlepage()
-    crawl_artist_image_albumpage()
-
+    # crawl_artist_image_albumpage()
 
     # update_wiki_singlepage()
-    # update_wiki_albumpage()
-
+    update_wiki_albumpage()
 
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))

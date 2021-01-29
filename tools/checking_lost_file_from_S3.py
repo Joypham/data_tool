@@ -9,8 +9,12 @@ from core import query_path
 from tools.crawlingtask import crawl_youtube, WhenExist
 import pandas as pd
 import time
+import numpy as np
 
 import inspect
+
+import threading
+from threading import Thread
 
 
 def get_split_info(vibbidi_title: str, track_title: str):
@@ -122,12 +126,12 @@ def checking_lost_datasource_resize_image_from_S3(db_datasource: object):
                         continue
                 result = result + joy_xinh
                 if not loop:
-                    joy_xinh = joy_xinh + f"{method_name}, {db_datasource.id}, {expect_resize_image_type}, not have, not have, not have\n"
-                    result = result + f"{method_name}, {db_datasource.id}, {expect_resize_image_type}, not have, not have, not have\n"
+                    joy_xinh = joy_xinh + f"{method_name}, {db_datasource.id}, {expect_resize_image_type}, not have, not have, {db_datasource.source_uri}\n"
+                    result = result + f"{method_name}, {db_datasource.id}, {expect_resize_image_type}, not have, not have, {db_datasource.source_uri}\n"
                     f.write(joy_xinh)
         else:
-            result = result + f"{method_name}, {db_datasource.id}, not have, not have, not have, not have\n"
-            joy_xinh = f"{method_name}, {db_datasource.id}, not have, not have, not have, not have\n"
+            result = result + f"{method_name}, {db_datasource.id}, not have, not have, not have, {db_datasource.source_uri}\n"
+            joy_xinh = f"{method_name}, {db_datasource.id}, not have, not have, not have, {db_datasource.source_uri}\n"
             f.write(joy_xinh)
         print(result)
 
@@ -188,6 +192,29 @@ def checking_lost_static_video_from_S3(db_datasource):
             print(joy_xinh)
             f.write(joy_xinh)
 
+def update_wiki_result_to_gsheet():  # both single page and album page
+    sheet_name = 'wiki'
+    df_wiki = get_df_from_speadsheet(gsheetid, sheet_name)
+
+    conditions = [  # create a list of condition => if true =>> update value tương ứng
+        ((df_wiki['memo'] == 'not ok') | (df_wiki['memo'] == 'added')) & (df_wiki.content_to_add != 'none') & (
+                df_wiki.url_to_add != 'none') & (df_wiki.content_to_add != '') & (df_wiki.url_to_add != ''),
+        ((df_wiki['memo'] == 'not ok') | (df_wiki['memo'] == 'added')) & (
+                (df_wiki.content_to_add == 'none') | (df_wiki.url_to_add == 'none') | (
+                df_wiki.content_to_add == '') | (df_wiki.url_to_add == '')),
+        True]
+    values = ['wiki added', 'remove wiki', None]  # create a list of the values tương ứng với conditions ơ trên
+    df_wiki['joy xinh'] = np.select(conditions,
+                                    values)  # create a new column and use np.select to assign values to it using our lists as arguments
+    column_title = ['Joy note']
+    list_result = np.array(df_wiki['joy xinh']).reshape(-1,
+                                                        1).tolist()  # Chuyển về list từ 1 chiều về 2 chiều sử dung Numpy
+    list_result.insert(0, column_title)
+    range_to_update = f"{sheet_name}!K1"
+
+    update_value(list_result, range_to_update, gsheet_id)
+    print("update data in gsheet completed")
+
 def checking_lost_datasource_filename_from_S3(db_datasource: object):
     method_name = inspect.stack()[0][3]
     with open(query_path, "a+") as f:
@@ -208,7 +235,7 @@ if __name__ == "__main__":
     start_time = time.time()
     gsheetid = '1Qu5oUocflDr4ERJvux8eSnuVVIGp1-WNzjqE7NeYKJI'
     gsheet_name = get_gsheet_name(gsheet_id=gsheetid)
-    sheet_name = 'dsid'
+    sheet_name = 'dsid_joy'
     df = get_df_from_speadsheet(gsheet_id=gsheetid, sheet_name=sheet_name)
     list_dsid = list(dict.fromkeys(df['datasourceid'].values.tolist()))
     db_datasources = get_all_datasource_by_ids(list_dsid)

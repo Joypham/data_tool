@@ -1,11 +1,15 @@
-from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title, update_value, creat_new_sheet_and_update_data_from_df, get_gsheet_name
+from google_spreadsheet_api.function import get_df_from_speadsheet, get_list_of_sheet_title, update_value, \
+    creat_new_sheet_and_update_data_from_df, get_gsheet_name
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
-from core.crud.sql.datasource import get_datasourceid_from_youtube_url_and_trackid, related_datasourceid, get_youtube_info_from_trackid
+from core.crud.sql.datasource import get_datasourceid_from_youtube_url_and_trackid, related_datasourceid, \
+    get_youtube_info_from_trackid
 from core.models.data_source_format_master import DataSourceFormatMaster
 from core.crud.get_df_from_query import get_df_from_query
+from core.crud.sql.crawlingtask import get_artist_image_cant_crawl, get_album_image_cant_crawl
 
 from youtube_dl_fuction.fuctions import get_raw_title_uploader_from_youtube_url
+from support_function.automate_checking_crawler import automate_check_crawl_image_status
 
 from tools import get_uuid4
 from itertools import chain
@@ -28,6 +32,15 @@ class sheet_type:
                                                                     DataSourceFormatMaster.FORMAT_ID_MP4_LIVE],
                           "column_name": ["track_id", "Remix_url", "Remix_artist", "Live_url", "Live_venue",
                                           "Live_year"]}
+
+    ARTIST_IMAGE = {"sheet_name": "Artist_image", "column_name": ["Artist_uuid", "Memo", "url_to_add"]}
+    ALBUM_IMAGE = {"sheet_name": "Album_image", "column_name": ["Album_uuid", "Memo", "url_to_add"]}
+
+    ARTIST_WIKI = {"sheet_name": "Artist_wiki", "column_name": ["Artist_uuid", "Memo", "url_to_add", "content to add"],
+                   "table_name": "artists", "object_type": "artist"}
+    ALBUM_WIKI = {"sheet_name": "Album_wiki", "column_name": ["Album_uuid", "Memo", "url_to_add", "Content_to_add"],
+                  "table_name": "albums", "object_type": "album"}
+
 
 def check_youtube_url_mp3():
     '''
@@ -572,14 +585,130 @@ def final_check():
     merge_df['token_set_ratio_title'] = se_token_set_ratio_title.values
     merge_df['token_set_ratio_artist'] = se_token_set_ratio_artist.values
 
-    print(merge_df)
+    # print(merge_df)
 
-    updated_df = merge_df[['datasource_id', 'youtube_url', 'youtube_title', 'youtube_uploader', 'get_youtube_title', 'get_youtube_uploader', 'token_set_ratio_title', 'token_set_ratio_artist']]
+    updated_df = merge_df[['datasource_id', 'youtube_url', 'youtube_title', 'youtube_uploader', 'get_youtube_title',
+                           'get_youtube_uploader', 'token_set_ratio_title', 'token_set_ratio_artist']]
     column_name = updated_df.columns.values.tolist()
     list_result = updated_df.values.tolist()  # transfer data_frame to 2D list
     list_result.insert(0, column_name)
     range_to_update = f"{sheet_name}!K1"
     update_value(list_result, range_to_update, gsheet_id)  # validate_value type: object, int, category... NOT DATETIME
+
+
+def crawl_image(sheet_info: dict):
+    '''
+    ARTIST_IMAGE = {"sheet_name": "Artist_image", "column_name": ["Artist_uuid", "Memo", "url_to_add"]}
+    ALBUM_IMAGE = {"sheet_name": "Album_image", "column_name": ["Album_uuid", "Memo", "url_to_add"]}
+    :param sheet_info:
+    :return:
+    '''
+
+    # Step 1: Select process sheet
+    sheet_name = sheet_info['sheet_name']
+    column_name = sheet_info['column_name']
+    new_sheet_name = f"{sheet_name} cant upload"
+    if new_sheet_name in list_of_sheet_title:
+        filter_df = get_df_from_speadsheet(gsheet_id, new_sheet_name)
+        print(f"List {sheet_name} to crawl image \n ", filter_df, "\n")
+    else:
+        df = get_df_from_speadsheet(gsheet_id, sheet_name)
+        filter_df = df[(df.Memo == 'added')  # filter df by conditions
+                       & (df.url_to_add.notnull())
+                       & (df.url_to_add != '')
+                       ].reset_index().drop_duplicates(subset=[column_name[0]],
+                                                       keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+        print(f"List {sheet_name} to crawl image \n ", filter_df[column_name],
+              "\n")
+
+    # Step 2: get crawlingtask
+    row_index = filter_df.index
+    with open(query_path, "w") as f:
+        for i in row_index:
+            objectid = filter_df[column_name[0]].loc[i]
+            url_to_add = filter_df[column_name[2]].loc[i]
+            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{objectid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{url_to_add}','$.object_type', {sheet_info['object_type']}, '$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),1999);"
+            f.write(query + "\n")
+
+    # Step 3: automation check crawl_artist_image_status then export result:
+    automate_check_crawl_image_status()
+
+    # Step 4: upload image cant upload
+    uuid = filter_df[column_name[0]].tolist()
+    if sheet_name == "Artist_image":
+        df_image_cant_upload = get_df_from_query(
+            get_artist_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
+                                                                             keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+    elif sheet_name == "Album_image":
+        df_image_cant_upload = get_df_from_query(
+            get_album_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
+                                                                            keep='first')
+
+    joy = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')].uuid.tolist() == []
+
+    if joy == 1:
+        raw_df_to_upload = {'status': ['Upload thành công 100% nhé các em ^ - ^']}
+        df_to_upload = pd.DataFrame(data=raw_df_to_upload)
+    else:
+        df_to_upload = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')]
+
+    creat_new_sheet_and_update_data_from_df(df_to_upload, gsheet_id, new_sheet_name)
+
+
+def update_wiki_result_to_gsheet():  # both single page and album page
+    sheet_name = 'wiki'
+    df_wiki = get_df_from_speadsheet(gsheet_id, sheet_name)
+
+    conditions = [  # create a list of condition => if true =>> update value tương ứng
+        ((df_wiki['Memo'] == 'not ok') | (df_wiki['Memo'] == 'added')) & (df_wiki['content to add'] != 'none') & (
+                df_wiki.url_to_add != 'none') & (df_wiki['content to add'] != '') & (df_wiki.url_to_add != ''),
+        ((df_wiki['Memo'] == 'not ok') | (df_wiki['Memo'] == 'added')) & (
+                (df_wiki['content to add'] == 'none') | (df_wiki.url_to_add == 'none') | (
+                df_wiki['content to add'] == '') | (df_wiki.url_to_add == '')),
+        True]
+    values = ['wiki added', 'remove wiki', None]  # create a list of the values tương ứng với conditions ơ trên
+    df_wiki['joy xinh'] = np.select(conditions,
+                                    values)  # create a new column and use np.select to assign values to it using our lists as arguments
+    column_title = ['Joy note']
+    list_result = np.array(df_wiki['joy xinh']).reshape(-1,
+                                                        1).tolist()  # Chuyển về list từ 1 chiều về 2 chiều sử dung Numpy
+    list_result.insert(0, column_title)
+    range_to_update = f"{sheet_name}!J"
+
+    update_value(list_result, range_to_update, gsheet_id)
+    print("update data in gsheet completed")
+
+
+def update_wiki(sheet_info: dict):
+    '''
+    ARTIST_WIKI = {"sheet_name": "Artist_wiki", "column_name": ["Artist_uuid", "Memo", "url_to_add", "content to add"], "table_name": "artists"}
+    ALBUM_WIKI = {"sheet_name": "Album_wiki", "column_name": ["Album_uuid", "Memo", "url_to_add", "content to add"], "table_name": "albums"}
+    :param sheet_info:
+    :return:
+    '''
+
+    sheet_name = sheet_info['sheet_name']
+    df_wiki = get_df_from_speadsheet(gsheet_id, sheet_name)
+    df_wiki_filter = df_wiki[(df_wiki.Memo == 'added') | (df_wiki.Memo == 'not ok')]
+    row_index = df_wiki_filter.index
+    column_name = sheet_info['column_name']
+    table_name = sheet_info['table_name']
+    with open(query_path, "w") as f:
+        for i in row_index:
+            uuid = df_wiki_filter[column_name[0]].loc[i]
+            url = df_wiki_filter[column_name[2]].loc[i]
+            content = df_wiki_filter[column_name[3]].loc[i].replace('\'', '\\\'').replace("\"", "\\\"")
+            joy_xinh = f"Update {table_name} set info =  Json_replace(Json_remove(info,'$.wiki'),'$.wiki_url','not ok') where uuid = '{uuid}';"
+            query = ""
+            if url != "" and content != "" and url != 'none' and content != 'none':
+                query = f"UPDATE {table_name} SET info = Json_set(if(info is null,JSON_OBJECT(),info), '$.wiki', JSON_OBJECT('brief', '{content}'), '$.wiki_url','{url}') WHERE uuid = '{uuid}';"
+            else:
+                query = query
+            f.write(joy_xinh + "\n" + query + "\n")
+            print(joy_xinh + "\n" + query + "\n")
+
+    # Step 3: update gsheet
+    # update_wiki_result_to_gsheet()
 
 
 if __name__ == "__main__":
@@ -590,15 +719,18 @@ if __name__ == "__main__":
     # Jane requirement: https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=653576103
     # 'https://docs.google.com/spreadsheets/d/1MuEB6erMb8mD--HQLh85NDIcxL-coeoQ_wfB8ilyfak/edit#gid=1713188461'
 
-    # test: https://docs.google.com/spreadsheets/d/1gBYClGWQEyv4-Fp3tgw_Vu8M0Z5uKrldoZl3ul2HrNg/edit#gid=1537202324
-    gsheet_id = '1gBYClGWQEyv4-Fp3tgw_Vu8M0Z5uKrldoZl3ul2HrNg'
+    # test: https://docs.google.com/spreadsheets/d/1Ck9O771xM7VArdaYxbHTVtp4kRtHzPn57EDDId0cHJc/edit#gid=0
+    gsheet_id = '1Ck9O771xM7VArdaYxbHTVtp4kRtHzPn57EDDId0cHJc'
     gsheet_name = get_gsheet_name(gsheet_id=gsheet_id)
-    # print(gsheet_name)
-    sheet_info = sheet_type.MP3_SHEET_NAME
-    # final_check()
+    list_of_sheet_title = get_list_of_sheet_title(gsheet_id=gsheet_id)
+    sheet_info = sheet_type.ALBUM_IMAGE
 
     # Start tools:
     # check_box()
-    process_mp3_mp4(sheet_info)
+    # final_check()
+    # process_mp3_mp4(sheet_info)
     # process_version_sheet(sheet_info)
+    crawl_image(sheet_info)
+    # update_wiki(sheet_info)
+
     print("--- %s seconds ---" % (time.time() - start_time))

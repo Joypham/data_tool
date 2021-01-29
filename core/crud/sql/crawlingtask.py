@@ -1,5 +1,6 @@
 from core.models.crawlingtask import Crawlingtask
 from core.models.artist import Artist
+from core.models.album import Album
 from core.models.datasource import DataSource
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker, aliased
@@ -14,7 +15,7 @@ engine = create_engine(SQLALCHEMY_DATABASE_URI)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 
-def get_crawl_artist_image_status():
+def get_crawl_image_status():
     crawl_artist_image_status = (db_session.query(Crawlingtask.id,
                                                   Crawlingtask.actionid,
                                                   Crawlingtask.taskdetail,
@@ -28,8 +29,8 @@ def get_crawl_artist_image_status():
 
 
 def get_artist_image_cant_crawl(artistuuid: list):
-    artist_image_cant_crawl_single_page = (db_session.query(Artist.name,
-                                                            Artist.uuid.label("Artist_UUID"),
+    artist_image_cant_crawl = (db_session.query(Artist.name,
+                                                            Artist.uuid,
                                                             func.json_extract(Crawlingtask.taskdetail, "$.url").label(
                                                                 "image_url"),
                                                             Crawlingtask.status
@@ -44,7 +45,26 @@ def get_artist_image_cant_crawl(artistuuid: list):
                                            .order_by(Crawlingtask.objectid, Crawlingtask.created_at.desc())
 
                                            )
-    return artist_image_cant_crawl_single_page
+    return artist_image_cant_crawl
+
+
+def get_album_image_cant_crawl(artistuuid: list):
+    album_image_cant_crawl = (db_session.query(Album.title,
+                                               Album.uuid,
+                                               func.json_extract(Crawlingtask.taskdetail, "$.url").label(
+                                                   "image_url"),
+                                               Crawlingtask.status
+                                               )
+                              .select_from(Crawlingtask)
+                              .join(Album,
+                                    Album.uuid == Crawlingtask.objectid)
+                              .filter(func.DATE(Crawlingtask.created_at) == func.current_date(),
+                                      Crawlingtask.actionid == 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9',
+                                      Crawlingtask.objectid.in_(artistuuid)
+                                      )
+                              .order_by(Crawlingtask.objectid, Crawlingtask.created_at.desc())
+                              )
+    return album_image_cant_crawl
 
 
 def get_crawl_E5_06_status(ituneid: list):
