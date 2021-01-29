@@ -33,13 +33,13 @@ class sheet_type:
                           "column_name": ["track_id", "Remix_url", "Remix_artist", "Live_url", "Live_venue",
                                           "Live_year"]}
 
-    ARTIST_IMAGE = {"sheet_name": "Artist_image", "column_name": ["Artist_uuid", "Memo", "url_to_add"]}
-    ALBUM_IMAGE = {"sheet_name": "Album_image", "column_name": ["Album_uuid", "Memo", "url_to_add"]}
+    ARTIST_IMAGE = {"sheet_name": "Artist_image", "column_name": ["Artist_uuid", "Memo", "url_to_add"], "object_type": "artist"}
+    ALBUM_IMAGE = {"sheet_name": "Album_image", "column_name": ["Album_uuid", "Memo", "url_to_add"], "object_type": "album"}
 
     ARTIST_WIKI = {"sheet_name": "Artist_wiki", "column_name": ["Artist_uuid", "Memo", "url_to_add", "content to add"],
-                   "table_name": "artists", "object_type": "artist"}
+                   "table_name": "artists"}
     ALBUM_WIKI = {"sheet_name": "Album_wiki", "column_name": ["Album_uuid", "Memo", "url_to_add", "Content_to_add"],
-                  "table_name": "albums", "object_type": "album"}
+                  "table_name": "albums"}
 
 
 def check_youtube_url_mp3():
@@ -627,7 +627,7 @@ def crawl_image(sheet_info: dict):
         for i in row_index:
             objectid = filter_df[column_name[0]].loc[i]
             url_to_add = filter_df[column_name[2]].loc[i]
-            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{objectid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{url_to_add}','$.object_type', {sheet_info['object_type']}, '$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),1999);"
+            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{objectid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{url_to_add}','$.object_type', {sheet_info['column_name']}, '$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),1999);"
             f.write(query + "\n")
 
     # Step 3: automation check crawl_artist_image_status then export result:
