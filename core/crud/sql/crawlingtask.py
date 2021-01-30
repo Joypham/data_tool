@@ -30,7 +30,7 @@ def get_crawl_image_status():
 
 def get_artist_image_cant_crawl(artistuuid: list):
     artist_image_cant_crawl = (db_session.query(Artist.name,
-                                                            Artist.uuid,
+                                                            Artist.uuid.label("Artist_uuid"),
                                                             func.json_extract(Crawlingtask.taskdetail, "$.url").label(
                                                                 "image_url"),
                                                             Crawlingtask.status
@@ -50,7 +50,8 @@ def get_artist_image_cant_crawl(artistuuid: list):
 
 def get_album_image_cant_crawl(artistuuid: list):
     album_image_cant_crawl = (db_session.query(Album.title,
-                                               Album.uuid,
+                                               Album.artist,
+                                               Album.uuid.label("Album_uuid"),
                                                func.json_extract(Crawlingtask.taskdetail, "$.url").label(
                                                    "image_url"),
                                                Crawlingtask.status

@@ -598,8 +598,8 @@ def final_check():
 
 def crawl_image(sheet_info: dict):
     '''
-    ARTIST_IMAGE = {"sheet_name": "Artist_image", "column_name": ["Artist_uuid", "Memo", "url_to_add"]}
-    ALBUM_IMAGE = {"sheet_name": "Album_image", "column_name": ["Album_uuid", "Memo", "url_to_add"]}
+    ARTIST_IMAGE = {"sheet_name": "Artist_image", "column_name": ["Artist_uuid", "Memo", "url_to_add"], "object_type": "artist"}
+    ALBUM_IMAGE = {"sheet_name": "Album_image", "column_name": ["Album_uuid", "Memo", "url_to_add"], "object_type": "album"}
     :param sheet_info:
     :return:
     '''
@@ -627,7 +627,7 @@ def crawl_image(sheet_info: dict):
         for i in row_index:
             objectid = filter_df[column_name[0]].loc[i]
             url_to_add = filter_df[column_name[2]].loc[i]
-            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{objectid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{url_to_add}','$.object_type', {sheet_info['column_name']}, '$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),1999);"
+            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{objectid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{url_to_add}','$.object_type', '{sheet_info['object_type']}', '$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),1999);"
             f.write(query + "\n")
 
     # Step 3: automation check crawl_artist_image_status then export result:
@@ -637,14 +637,14 @@ def crawl_image(sheet_info: dict):
     uuid = filter_df[column_name[0]].tolist()
     if sheet_name == "Artist_image":
         df_image_cant_upload = get_df_from_query(
-            get_artist_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
+            get_artist_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=[column_name[0]],
                                                                              keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
     elif sheet_name == "Album_image":
         df_image_cant_upload = get_df_from_query(
-            get_album_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
+            get_album_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=[column_name[0]],
                                                                             keep='first')
 
-    joy = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')].uuid.tolist() == []
+    joy = df_image_cant_upload[df_image_cant_upload.status == 'incomplete'].values.tolist() == []
 
     if joy == 1:
         raw_df_to_upload = {'status': ['Upload thành công 100% nhé các em ^ - ^']}
