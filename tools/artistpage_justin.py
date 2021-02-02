@@ -711,6 +711,12 @@ def update_wiki(sheet_info: dict):
     # update_wiki_result_to_gsheet()
 
 
+def get_gsheet_id_from_url(url: str):
+    url_list = url.split("/")
+    gsheet_id = url_list[5]
+    return gsheet_id
+
+
 if __name__ == "__main__":
     start_time = time.time()
     pd.set_option("display.max_rows", None, "display.max_columns", 50, 'display.width', 1000)
@@ -719,11 +725,19 @@ if __name__ == "__main__":
     # Jane requirement: https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=653576103
     # 'https://docs.google.com/spreadsheets/d/1MuEB6erMb8mD--HQLh85NDIcxL-coeoQ_wfB8ilyfak/edit#gid=1713188461'
 
-    # test: https://docs.google.com/spreadsheets/d/1Ck9O771xM7VArdaYxbHTVtp4kRtHzPn57EDDId0cHJc/edit#gid=0
-    gsheet_id = '1Ck9O771xM7VArdaYxbHTVtp4kRtHzPn57EDDId0cHJc'
-    gsheet_name = get_gsheet_name(gsheet_id=gsheet_id)
-    list_of_sheet_title = get_list_of_sheet_title(gsheet_id=gsheet_id)
+    urls = [
+        "https://docs.google.com/spreadsheets/d/1L17AVvNANbHYyLFKXlYRBEol8nZ14pvO3_KSGlQf0WE/edit#gid=1241019472",
+        "https://docs.google.com/spreadsheets/d/14tBa8mqCAXw50qcQfZsrTs70LeKIPEe9yISsXxYgQUk/edit",
+        "https://docs.google.com/spreadsheets/d/1qIfm2xhAIRb6kN6P1MgHMTNhlBYpLTApoMSyNa2fxk0/edit#gid=704433363",
+        "https://docs.google.com/spreadsheets/d/1Mbe1_ANXUMps_LONbn8ntaARg5JqU7v1dMU8KUpnCwo/edit#gid=408034383",
+        "https://docs.google.com/spreadsheets/d/16vY2NdX8IVHbeg7cHW2gSKsVd8CJiSadN33QKTz0cII/edit#gid=1243013907"
+    ]
     sheet_info = sheet_type.ALBUM_IMAGE
+    for url in urls:
+        gsheet_id = get_gsheet_id_from_url(url=url)
+        gsheet_name = get_gsheet_name(gsheet_id=gsheet_id)
+        list_of_sheet_title = get_list_of_sheet_title(gsheet_id=gsheet_id)
+        crawl_image(sheet_info)
 
     # Start tools:
     # check_box()
