@@ -233,11 +233,16 @@ if __name__ == "__main__":
     # https://docs.google.com/spreadsheets/d/1Qu5oUocflDr4ERJvux8eSnuVVIGp1-WNzjqE7NeYKJI/edit#gid=709402142
 
     start_time = time.time()
-    gsheetid = '1Qu5oUocflDr4ERJvux8eSnuVVIGp1-WNzjqE7NeYKJI'
-    gsheet_name = get_gsheet_name(gsheet_id=gsheetid)
-    sheet_name = 'dsid_joy'
-    df = get_df_from_speadsheet(gsheet_id=gsheetid, sheet_name=sheet_name)
-    list_dsid = list(dict.fromkeys(df['datasourceid'].values.tolist()))
+    # gsheetid = '1Qu5oUocflDr4ERJvux8eSnuVVIGp1-WNzjqE7NeYKJI'
+    # gsheet_name = get_gsheet_name(gsheet_id=gsheetid)
+    # sheet_name = 'dsid_joy'
+    # df = get_df_from_speadsheet(gsheet_id=gsheetid, sheet_name=sheet_name)
+    # list_dsid = list(dict.fromkeys(df['datasourceid'].values.tolist()))
+    list_dsid = [
+        "5DDB279A07984014825555E35374C54A",
+        "A621B23EC5F546DAA902A79950D6FCF7",
+        "C0FD920FAE92496988E1B7844505EBD0"
+    ]
     db_datasources = get_all_datasource_by_ids(list_dsid)
     for db_datasource in db_datasources:
         print(f"{db_datasource.id}----{db_datasource.format_id}----{db_datasource.source_uri}")

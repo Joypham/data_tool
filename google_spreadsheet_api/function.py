@@ -193,5 +193,6 @@ if __name__ == "__main__":
     #     https://docs.google.com/spreadsheets/d/1aoORoNmZoBtnY_jrBDOeLTrwLF0oeJUUDAb173BMf78/edit#gid=0
     gsheet_id = "1aoORoNmZoBtnY_jrBDOeLTrwLF0oeJUUDAb173BMf78"
     sheet_name = "Sheet1"
-    joy = get_df_from_speadsheet(gsheet_id=gsheet_id, sheet_name=sheet_name)
+    # joy = get_df_from_speadsheet(gsheet_id=gsheet_id, sheet_name=sheet_name)
+    joy = get_gsheet_name(gsheet_id)
     print(joy)

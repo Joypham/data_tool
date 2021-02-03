@@ -348,7 +348,8 @@ def check_artist_wiki():
 
 def check_box():
     # Check all element:
-    list_of_sheet_title = get_list_of_sheet_title(gsheet_id)
+    print(f"\n{get_gsheet_name(gsheet_id=gsheet_id)}\n{url}\n")
+    list_of_sheet_title = get_list_of_sheet_title(gsheet_id=gsheet_id)
 
     if 'MP_3' in list_of_sheet_title:
         youtube_url_mp3 = check_youtube_url_mp3().to_numpy().tolist()
@@ -403,7 +404,6 @@ def check_box():
             status.append('not ok')
             comment.append(j)
             items.append(i)
-    print(comment)
 
     d = {'items': items, 'status': status, 'comment': comment}
     df = pd.DataFrame(data=d).astype(str)
@@ -737,10 +737,11 @@ if __name__ == "__main__":
         gsheet_id = get_gsheet_id_from_url(url=url)
         gsheet_name = get_gsheet_name(gsheet_id=gsheet_id)
         list_of_sheet_title = get_list_of_sheet_title(gsheet_id=gsheet_id)
-        crawl_image(sheet_info)
+        # crawl_image(sheet_info)
+        check_box()
 
     # Start tools:
-    # check_box()
+    check_box()
     # final_check()
     # process_mp3_mp4(sheet_info)
     # process_version_sheet(sheet_info)
