@@ -297,6 +297,6 @@ if __name__ == "__main__":
     # crawl_artist_image_albumpage()
 
     # update_wiki_singlepage()
-    update_wiki_albumpage()
+    # update_wiki_albumpage()
 
     print("\n --- total time to process %s seconds ---" % (time.time() - start_time))

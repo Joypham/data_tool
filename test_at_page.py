@@ -623,35 +623,42 @@ def crawl_image(sheet_info: dict):
 
     # Step 2: get crawlingtask
     row_index = filter_df.index
-    with open(query_path, "w") as f:
+    with open(query_path, "a+") as f:
         for i in row_index:
             objectid = filter_df[column_name[0]].loc[i]
             url_to_add = filter_df[column_name[2]].loc[i]
             query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{objectid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{url_to_add}','$.object_type', {sheet_info['column_name']}, '$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),1999);"
             f.write(query + "\n")
+    return filter_df
 
+
+def automate_checking_and_get_result():
     # Step 3: automation check crawl_artist_image_status then export result:
-    # automate_check_crawl_image_status()
+    automate_check_crawl_image_status()
 
     # Step 4: upload image cant upload
-    # uuid = filter_df[column_name[0]].tolist()
-    # if sheet_name == "Artist_image":
-    #     df_image_cant_upload = get_df_from_query(
-    #         get_artist_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
-    #                                                                          keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
-    # elif sheet_name == "Album_image":
-    #     df_image_cant_upload = get_df_from_query(
-    #         get_album_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
-    #                                                                         keep='first')
-    #
-    # joy = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')].uuid.tolist() == []
-    #
-    # if joy == 1:
-    #     raw_df_to_upload = {'status': ['Upload thành công 100% nhé các em ^ - ^']}
-    #     df_to_upload = pd.DataFrame(data=raw_df_to_upload)
-    # else:
-    #     df_to_upload = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')]
-    #
+    sheet_name = sheet_info['sheet_name']
+    column_name = sheet_info['column_name']
+    new_sheet_name = f"{sheet_name} cant upload"
+    filter_df = crawl_image(sheet_info=sheet_info)
+    uuid = filter_df[column_name[0]].tolist()
+    if sheet_name == "Artist_image":
+        df_image_cant_upload = get_df_from_query(
+            get_artist_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
+                                                                             keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+    elif sheet_name == "Album_image":
+        df_image_cant_upload = get_df_from_query(
+            get_album_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
+                                                                            keep='first')
+
+    joy = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')].uuid.tolist() == []
+
+    if joy == 1:
+        raw_df_to_upload = {'status': ['Upload thành công 100% nhé các em ^ - ^']}
+        df_to_upload = pd.DataFrame(data=raw_df_to_upload)
+    else:
+        df_to_upload = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')]
+
     # creat_new_sheet_and_update_data_from_df(df_to_upload, gsheet_id, new_sheet_name)
 
 
@@ -720,6 +727,8 @@ def get_gsheet_id_from_url(url: str):
 if __name__ == "__main__":
     start_time = time.time()
     pd.set_option("display.max_rows", None, "display.max_columns", 50, 'display.width', 1000)
+    with open(query_path, "w") as f:
+        f.truncate()
     # INPUT HERE
     # Justin requirement: https://docs.google.com/spreadsheets/d/1LClklcO0OEMmQ1iaCZ34n1hhjlP1lIBj7JMjm2qrYVw/edit#gid=0
     # Jane requirement: https://docs.google.com/spreadsheets/d/1nm7DRUX0v1zODohS6J5LTDHP2Rew-OxSw8qN5FiplVk/edit#gid=653576103
@@ -737,11 +746,14 @@ if __name__ == "__main__":
         gsheet_id = get_gsheet_id_from_url(url=url)
         gsheet_name = get_gsheet_name(gsheet_id=gsheet_id)
         list_of_sheet_title = get_list_of_sheet_title(gsheet_id=gsheet_id)
+
+        # check_box()
         # crawl_image(sheet_info)
-        check_box()
+
+
 
     # Start tools:
-    check_box()
+    # check_box()
     # final_check()
     # process_mp3_mp4(sheet_info)
     # process_version_sheet(sheet_info)
