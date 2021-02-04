@@ -1,6 +1,8 @@
 from core.crud.get_df_from_query import get_df_from_query
 from core.crud.sql.crawlingtask import get_crawl_image_status, get_artist_image_cant_crawl
 import time
+
+
 def automate_check_crawl_image_status():  # need to optimize
     commit_message = input(f"\n Do you complete crawling_tasks insertion ?: True or False:")
 

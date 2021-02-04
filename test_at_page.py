@@ -618,7 +618,7 @@ def crawl_image(sheet_info: dict):
                        & (df.url_to_add != '')
                        ].reset_index().drop_duplicates(subset=[column_name[0]],
                                                        keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
-        print(f"List {sheet_name} to crawl image \n ", filter_df[column_name],
+        print(f"List {sheet_name} to crawl image in {gsheet_name}\n{url}\n ", filter_df[column_name],
               "\n")
 
     # Step 2: get crawlingtask
@@ -627,37 +627,42 @@ def crawl_image(sheet_info: dict):
         for i in row_index:
             objectid = filter_df[column_name[0]].loc[i]
             url_to_add = filter_df[column_name[2]].loc[i]
-            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{objectid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{url_to_add}','$.object_type', {sheet_info['column_name']}, '$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),1999);"
+            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{objectid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{url_to_add}','$.object_type', {sheet_info['object_type']}, '$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),1999);"
             f.write(query + "\n")
     return filter_df
 
 
 def automate_checking_and_get_result():
+    # Step 1: check crawling task
+    filter_df = crawl_image(sheet_info=sheet_info)
+    # print(filter_df)
+
+
     # Step 3: automation check crawl_artist_image_status then export result:
-    automate_check_crawl_image_status()
+    # automate_check_crawl_image_status()
 
     # Step 4: upload image cant upload
-    sheet_name = sheet_info['sheet_name']
-    column_name = sheet_info['column_name']
-    new_sheet_name = f"{sheet_name} cant upload"
-    filter_df = crawl_image(sheet_info=sheet_info)
-    uuid = filter_df[column_name[0]].tolist()
-    if sheet_name == "Artist_image":
-        df_image_cant_upload = get_df_from_query(
-            get_artist_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
-                                                                             keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
-    elif sheet_name == "Album_image":
-        df_image_cant_upload = get_df_from_query(
-            get_album_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
-                                                                            keep='first')
-
-    joy = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')].uuid.tolist() == []
-
-    if joy == 1:
-        raw_df_to_upload = {'status': ['Upload thành công 100% nhé các em ^ - ^']}
-        df_to_upload = pd.DataFrame(data=raw_df_to_upload)
-    else:
-        df_to_upload = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')]
+    # sheet_name = sheet_info['sheet_name']
+    # column_name = sheet_info['column_name']
+    # new_sheet_name = f"{sheet_name} cant upload"
+    # filter_df = crawl_image(sheet_info=sheet_info)
+    # uuid = filter_df[column_name[0]].tolist()
+    # if sheet_name == "Artist_image":
+    #     df_image_cant_upload = get_df_from_query(
+    #         get_artist_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
+    #                                                                          keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+    # elif sheet_name == "Album_image":
+    #     df_image_cant_upload = get_df_from_query(
+    #         get_album_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
+    #                                                                         keep='first')
+    #
+    # joy = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')].uuid.tolist() == []
+    #
+    # if joy == 1:
+    #     raw_df_to_upload = {'status': ['Upload thành công 100% nhé các em ^ - ^']}
+    #     df_to_upload = pd.DataFrame(data=raw_df_to_upload)
+    # else:
+    #     df_to_upload = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')]
 
     # creat_new_sheet_and_update_data_from_df(df_to_upload, gsheet_id, new_sheet_name)
 
@@ -748,9 +753,8 @@ if __name__ == "__main__":
         list_of_sheet_title = get_list_of_sheet_title(gsheet_id=gsheet_id)
 
         # check_box()
-        # crawl_image(sheet_info)
-
-
+        crawl_image(sheet_info)
+        automate_checking_and_get_result()
 
     # Start tools:
     # check_box()
