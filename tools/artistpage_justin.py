@@ -737,7 +737,8 @@ if __name__ == "__main__":
         gsheet_id = get_gsheet_id_from_url(url=url)
         gsheet_name = get_gsheet_name(gsheet_id=gsheet_id)
         list_of_sheet_title = get_list_of_sheet_title(gsheet_id=gsheet_id)
-        crawl_image(sheet_info)
+        check_box()
+        # crawl_image(sheet_info)
 
     # Start tools:
     # check_box()

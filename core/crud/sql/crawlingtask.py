@@ -15,13 +15,13 @@ engine = create_engine(SQLALCHEMY_DATABASE_URI)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 
-def get_crawl_image_status():
+def get_crawl_image_status(gsheet_name: str, sheet_name: str):
     crawl_artist_image_status = (db_session.query(Crawlingtask.id,
                                                   Crawlingtask.actionid,
                                                   Crawlingtask.taskdetail,
                                                   Crawlingtask.status)
                                  .select_from(Crawlingtask)
-                                 .filter(func.DATE(Crawlingtask.created_at) == func.current_date(),
+                                 .filter(func.json_extract(Crawlingtask.taskdetail, "$.PIC") == f"{gsheet_name}_{sheet_name}",
                                          Crawlingtask.actionid == 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9')
                                  .order_by(Crawlingtask.objectid, Crawlingtask.created_at.desc())
                                  )
@@ -111,9 +111,8 @@ def get_datasourceId_from_crawlingtask():
     return record
 
 
-# if __name__ == "__main__":
-#     # artistuuid = ['F241DAA56E76411592789860AE809F5F', 'F241DAA56E76411592789860AE809F5F']
-#     # joy = get_artist_image_cant_crawl(artistuuid)
-#     joy = get_artist_image_cant_crawl()
-#     k = get_compiled_raw_mysql(joy)
-#     print(k)
+if __name__ == "__main__":
+    artistuuid = ['F241DAA56E76411592789860AE809F5F', 'F241DAA56E76411592789860AE809F5F']
+    joy = get_crawl_image_status(gsheet_name="joy", sheet_name="joy xinh")
+    k = get_compiled_raw_mysql(joy)
+    print(k)
