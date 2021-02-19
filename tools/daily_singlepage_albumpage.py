@@ -117,7 +117,7 @@ def crawl_artist_image_singlepage():
     # # Step 4: upload artist image cant upload
     artist_uuid = filter_df['Artist_UUID'].tolist()
     df_artist_image_cant_upload = get_df_from_query(
-        get_artist_image_cant_crawl(artist_uuid)).reset_index().drop_duplicates(subset=['Artist_UUID'],
+        get_artist_image_cant_crawl(artist_uuid)).reset_index().drop_duplicates(subset=['uuid'],
                                                                                 keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
 
     df_artist_image_cant_upload = df_artist_image_cant_upload.rename(columns={'uuid': 'Artist_UUID'})
@@ -144,7 +144,7 @@ def crawl_artist_image_albumpage():
         filter_df = df[(df.A12 == 'missing')  # filter df by conditions
                        & (df.artist_url_to_add.notnull())
                        & (df.artist_url_to_add != '')
-                       ].reset_index().drop_duplicates(subset=['uuid'],
+                       ].reset_index().drop_duplicates(subset=['Artist_UUID'],
                                                        keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
         print("List artist to crawl image \n ", filter_df[['ArtistName', 'Artist_UUID', 'A12', 'artist_url_to_add']],
               "\n")
