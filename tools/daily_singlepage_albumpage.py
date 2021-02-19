@@ -9,6 +9,8 @@ from google_spreadsheet_api.function import get_list_of_sheet_title, update_valu
     get_gsheet_name
 from google_spreadsheet_api.create_new_sheet_and_update_data_from_df import creat_new_sheet_and_update_data_from_df
 
+from support_function.automate_checking_crawler import automate_check_crawl_image_status
+
 import time
 import pandas as pd
 import numpy as np
@@ -110,13 +112,15 @@ def crawl_artist_image_singlepage():
             f.write(query + "\n")
 
     # Step 3: automation check crawl_artist_image_status then export result:
-    automate_check_crawl_artist_image_status()
+    automate_check_crawl_image_status(gsheet_name=gsheet_name, sheet_name=sheet_name)
     #
     # # Step 4: upload artist image cant upload
     artist_uuid = filter_df['Artist_UUID'].tolist()
     df_artist_image_cant_upload = get_df_from_query(
         get_artist_image_cant_crawl(artist_uuid)).reset_index().drop_duplicates(subset=['Artist_UUID'],
                                                                                 keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+
+    df_artist_image_cant_upload = df_artist_image_cant_upload.rename(columns={'uuid': 'Artist_UUID'})
 
     joy = df_artist_image_cant_upload[(df_artist_image_cant_upload.status == 'incomplete')].Artist_UUID.tolist() == []
 
@@ -140,7 +144,7 @@ def crawl_artist_image_albumpage():
         filter_df = df[(df.A12 == 'missing')  # filter df by conditions
                        & (df.artist_url_to_add.notnull())
                        & (df.artist_url_to_add != '')
-                       ].reset_index().drop_duplicates(subset=['Artist_UUID'],
+                       ].reset_index().drop_duplicates(subset=['uuid'],
                                                        keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
         print("List artist to crawl image \n ", filter_df[['ArtistName', 'Artist_UUID', 'A12', 'artist_url_to_add']],
               "\n")
@@ -155,13 +159,15 @@ def crawl_artist_image_albumpage():
             f.write(query + "\n")
 
     # Step 3: automation check crawl_artist_image_status then export result:
-    automate_check_crawl_artist_image_status()
+    automate_check_crawl_image_status(gsheet_name=gsheet_name, sheet_name=sheet_name)
 
     # Step 4: upload artist image cant upload
     artist_uuid = filter_df['Artist_UUID'].tolist()
+
     df_artist_image_cant_upload = get_df_from_query(
-        get_artist_image_cant_crawl(artist_uuid)).reset_index().drop_duplicates(subset=['Artist_UUID'],
+        get_artist_image_cant_crawl(artist_uuid)).reset_index().drop_duplicates(subset=['uuid'],
                                                                                 keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+    df_artist_image_cant_upload = df_artist_image_cant_upload.rename(columns={'uuid': 'Artist_UUID'})
     joy = df_artist_image_cant_upload[(df_artist_image_cant_upload.status == 'incomplete')].Artist_UUID.tolist() == []
 
     if joy == 1:
@@ -278,8 +284,8 @@ if __name__ == "__main__":
     # INPUT HERE:
     # Input_url 'https://docs.google.com/spreadsheets/d/1S2HD6IL_QdgFNgdm3811JBY3pX9UE2Oa36C_tulpJBw/edit#gid=2066669079'
 
-    gsheet_id = '1WADyMyS9Bcbgxcr2aZpIiBg_3MNAA4LbpakUUsjRGOc'  # Album page
-    sheet_name = '11.01.2021'
+    gsheet_id = '1pdx9HvzUtKOLQw5u0et7sXeI3vMxCfinVk8aKAQ6aMw'  # Album page
+    sheet_name = '15.02.2021'
 
     # Input_url 'https://docs.google.com/spreadsheets/d/1j_8tC9q9--6oXxmnNt1CkimBaNunaLl-p2UzrFrb2hk/edit#gid=737499827'
     # gsheet_id = '1Hfeo1IjJ9FuW6v7LQxrC1eZ7lI-BFVPg308JwKu0XY0'  # Single page
@@ -294,7 +300,7 @@ if __name__ == "__main__":
     # upload_track_lyrics()
 
     # crawl_artist_image_singlepage()
-    # crawl_artist_image_albumpage()
+    crawl_artist_image_albumpage()
 
     # update_wiki_singlepage()
     # update_wiki_albumpage()

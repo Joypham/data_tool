@@ -6,7 +6,7 @@ from core.crud.sql.datasource import get_datasourceid_from_youtube_url_and_track
     get_youtube_info_from_trackid
 from core.models.data_source_format_master import DataSourceFormatMaster
 from core.crud.get_df_from_query import get_df_from_query
-from core.crud.sql.crawlingtask import get_artist_image_cant_crawl, get_album_image_cant_crawl
+from core.crud.sql.crawlingtask import get_artist_image_cant_crawl, get_album_image_cant_crawl, get_crawl_image_status
 
 from youtube_dl_fuction.fuctions import get_raw_title_uploader_from_youtube_url
 from support_function.automate_checking_crawler import automate_check_crawl_image_status
@@ -17,6 +17,7 @@ import pandas as pd
 import time
 from core import query_path
 from support_function.text_similarity.text_similarity import get_token_set_ratio
+from support_function.automate_checking_crawler import automate_check_crawl_image_status
 from numpy import random
 import numpy as np
 
@@ -629,41 +630,55 @@ def crawl_image(sheet_info: dict):
         for i in row_index:
             objectid = filter_df[column_name[0]].loc[i]
             url_to_add = filter_df[column_name[2]].loc[i]
-            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{objectid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{url_to_add}','$.object_type', {sheet_info['object_type']}, '$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),1999);"
+            query = f"insert into crawlingtasks(Id, ActionId,objectid ,TaskDetail, Priority) values (uuid4(), 'OA9CPKSUT6PBGI1ZHPLQUPQCGVYQ71S9','{objectid}',JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url','{url_to_add}','$.object_type', '{sheet_info['object_type']}', '$.when_exists',\"replace\",'$.PIC', '{gsheet_name}_{sheet_name}'),1999);"
             f.write(query + "\n")
     return filter_df
 
 
 def automate_checking_and_get_result(sheet_info: dict):
+    '''
+
+    :param sheet_info:
+    ARTIST_IMAGE = {"sheet_name": "Artist_image", "column_name": ["Artist_uuid", "Memo", "url_to_add"], "object_type": "artist"}
+    ALBUM_IMAGE = {"sheet_name": "Album_image", "column_name": ["Album_uuid", "Memo", "url_to_add"], "object_type": "album"}
+    :return:
+    '''
     sheet_name = sheet_info['sheet_name']
     column_name = sheet_info['column_name']
 
     # Step 1: check crawling task
     filter_df = crawl_image(sheet_info=sheet_info)
 
+    # Step 2: Check accuracy
+    crawl_image_status_df = get_df_from_query(get_crawl_image_status(sheet_name=sheet_name, gsheet_name=gsheet_name))
+    # merge_df = pd.merge(left=filter_df, right=crawl_image_status_df, left_on=[column_name[0], column_name[2]], right_on= [])
+
+
+
+
     # Step 2: automation check crawl_artist_image_status then export result:
-    automate_check_crawl_image_status(gsheet_name=gsheet_name, sheet_name=sheet_name)
+    # automate_check_crawl_image_status(gsheet_name=gsheet_name, sheet_name=sheet_name)
 
     # Step 4: upload image cant upload
 
-    uuid = filter_df[column_name[0]].tolist()
-    if sheet_name == "Artist_image":
-        df_image_cant_upload = get_df_from_query(
-            get_artist_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
-                                                                             keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
-    elif sheet_name == "Album_image":
-        df_image_cant_upload = get_df_from_query(
-            get_album_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
-                                                                            keep='first')
+    # uuid = filter_df[column_name[0]].tolist()
+    # if sheet_name == "Artist_image":
+    #     df_image_cant_upload = get_df_from_query(
+    #         get_artist_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
+    #                                                                          keep='first')  # remove duplicate df by column (reset_index before drop_duplicate: because of drop_duplicate default reset index)
+    # elif sheet_name == "Album_image":
+    #     df_image_cant_upload = get_df_from_query(
+    #         get_album_image_cant_crawl(uuid)).reset_index().drop_duplicates(subset=['uuid'],
+    #                                                                         keep='first')
+    #
+    # joy = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')].uuid.tolist() == []
+    #
+    # if joy == 1:
+    #     raw_df_to_upload = {'status': ['Upload thành công 100% nhé các em ^ - ^']}
+    #     df_to_upload = pd.DataFrame(data=raw_df_to_upload)
+    # else:
+    #     df_to_upload = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')]
 
-    joy = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')].uuid.tolist() == []
-
-    if joy == 1:
-        raw_df_to_upload = {'status': ['Upload thành công 100% nhé các em ^ - ^']}
-        df_to_upload = pd.DataFrame(data=raw_df_to_upload)
-    else:
-        df_to_upload = df_image_cant_upload[(df_image_cant_upload.status == 'incomplete')]
-        print()
 
     # new_sheet_name = f"{sheet_name} cant upload"
     # creat_new_sheet_and_update_data_from_df(df_to_upload, gsheet_id, new_sheet_name)
@@ -748,6 +763,7 @@ if __name__ == "__main__":
         "https://docs.google.com/spreadsheets/d/1Mbe1_ANXUMps_LONbn8ntaARg5JqU7v1dMU8KUpnCwo/edit#gid=408034383",
         "https://docs.google.com/spreadsheets/d/16vY2NdX8IVHbeg7cHW2gSKsVd8CJiSadN33QKTz0cII/edit#gid=1243013907"
     ]
+
     sheet_info = sheet_type.ARTIST_IMAGE
 
     for url in urls:

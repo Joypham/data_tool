@@ -18,6 +18,7 @@ db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind
 def get_crawl_image_status(gsheet_name: str, sheet_name: str):
     crawl_artist_image_status = (db_session.query(Crawlingtask.id,
                                                   Crawlingtask.actionid,
+                                                  Crawlingtask.objectid,
                                                   Crawlingtask.taskdetail,
                                                   Crawlingtask.status)
                                  .select_from(Crawlingtask)
