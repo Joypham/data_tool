@@ -12,6 +12,12 @@ class WhenExist():
     KEEP_BOTH = "keep both"
 
 
+class object_type():
+    artist = 'artist'
+    album = 'album'
+    track = 'track'
+
+
 class sheet_type:
     MP3_SHEET_NAME = {"sheet_name": "MP_3", "fomatid": DataSourceFormatMaster.FORMAT_ID_MP3_FULL,
                       "column_name": ["track_id", "Memo", "Mp3_link", "url_to_add"]}
@@ -62,12 +68,20 @@ def convert_dict(raw_dict: dict):
         result = result + f"{key}: '{value}', "
     result = "{" + result[:-2] + "}"
     print(result)
-    # joy = {'name': 'a testing track', 'uuid': '5946AB77C52C45F8AA4283C1CF9EF70A'}
-    # convert_dict(joy)
+
+
+def crawl_image(url: str, objectid: str, object_type: str, pic: str = "Joy_xinh", priority: int = 1999):
+    crawl_image = f"insert into crawlingtasks(Id, ObjectID, ActionId, TaskDetail, Priority) values (uuid4(), '{objectid}', '{V4CrawlingTaskActionMaster.ARTIST_ALBUM_IMAGE}', JSON_SET(IFNULL(crawlingtasks.TaskDetail, JSON_OBJECT()), '$.url', '{url}','$.object_type', '{object_type}' , '$.PIC', '{pic}'), {priority});\n"
+    return crawl_image
 
 
 if __name__ == "__main__":
     start_time = time.time()
-    k = crawl_youtube(track_id='joy', youtube_url='joy', format_id=DataSourceFormatMaster.FORMAT_ID_MP4_FULL)
+    pd.set_option("display.max_rows", None, "display.max_columns", 50, 'display.width', 1000)
+    # k = crawl_youtube(track_id='joy', youtube_url='joy', format_id=DataSourceFormatMaster.FORMAT_ID_MP4_FULL)
+    url = 'https://i1.sndcdn.com/avatars-2rvazRKabXdmfVDx-HafcWQ-t500x500.jpg'
+    objectid = 'F2330E8E2E22451CBBB4A53F25B72476'
+
+    k = crawl_image(url=url, objectid=objectid, pic="joy qua xinh", object_type=object_type.artist, priority=1)
     print(k)
     pd.set_option("display.max_rows", None, "display.max_columns", 50, 'display.width', 1000)
