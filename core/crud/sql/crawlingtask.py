@@ -20,7 +20,6 @@ def get_crawl_image_status(gsheet_name: str, sheet_name: str):
                                                   Crawlingtask.actionid,
                                                   Crawlingtask.objectid,
                                                   Crawlingtask.taskdetail,
-                                                  func.json_extract(Crawlingtask.taskdetail, "$.url").label("image_url"),
                                                   Crawlingtask.status)
                                  .select_from(Crawlingtask)
                                  .filter(func.json_extract(Crawlingtask.taskdetail, "$.PIC") == f"{gsheet_name}_{sheet_name}",
